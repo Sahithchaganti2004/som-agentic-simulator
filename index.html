@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Agent & Cloudify/Terraform Orchestration: SOM Simulator</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        outfit: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        slate: {
+                            950: '#020617',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom CSS Stylesheet -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="font-sans min-h-screen flex flex-col selection:bg-cyan-500 selection:text-slate-900 overflow-x-hidden pb-12">
+
+    <!-- Glowing Background Orbs -->
+    <div class="fixed top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-950/20 blur-[120px] pointer-events-none z-0"></div>
+    <div class="fixed bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-emerald-950/20 blur-[120px] pointer-events-none z-0"></div>
+
+    <!-- Header Section -->
+    <header class="sticky top-0 z-40 bg-slate-950/80 backdrop-blur-md border-b border-slate-900/80 px-4 py-3 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+                <div class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-indigo-950 border border-indigo-900/60 text-indigo-400 text-[10px] font-bold uppercase tracking-wider font-outfit">
+                    <i class="fa-solid fa-microchip text-cyan-400"></i> Orchestration Sandbox
+                </div>
+                <h1 class="text-xl md:text-2xl font-extrabold font-outfit tracking-tight bg-gradient-to-r from-slate-100 via-indigo-200 to-cyan-400 bg-clip-text text-transparent">
+                    AI Agentic Orchestration vs. Traditional Operations
+                </h1>
+            </div>
+            
+            <!-- Tabbed Navigation -->
+            <nav class="flex p-0.5 rounded-xl bg-slate-900/90 border border-slate-850 shadow-2xl backdrop-blur-md self-start md:self-center">
+                <button id="nav-btn-baseline" class="nav-tab active flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-300">
+                    <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span> 1. Traditional Ops
+                </button>
+                <button id="nav-btn-agentic" class="nav-tab flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-300">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> 2. AI-Driven Orchestration
+                </button>
+                <button id="nav-btn-comparison" class="nav-tab flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-300">
+                    <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span> 3. SOM Matrix
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="relative z-10 flex-1 max-w-7xl w-full mx-auto px-4 py-6 sm:px-6 lg:px-8 flex flex-col lg:flex-row gap-6">
+        
+        <!-- Left: Active Simulator Page -->
+        <div class="flex-1 flex flex-col gap-6">
+            
+            <!-- PAGE 1: TRADITIONAL OPERATIONS -->
+            <main id="page-baseline" class="flex flex-col gap-6 animate-fade">
+                <div class="glass-card p-5 rounded-3xl border border-rose-950/20 bg-slate-900/10 shadow-2xl relative">
+                    <!-- Section Title -->
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h3 class="font-outfit text-base font-bold text-rose-300 flex items-center gap-2">
+                                <i class="fa-solid fa-user-gear text-rose-500 animate-pulse"></i> 
+                                Traditional Manual Provisioning Pipeline
+                            </h3>
+                            <p class="text-slate-500 text-[10px] uppercase font-bold tracking-wider">Manual Terraform Scripting & Email Ticket System</p>
+                        </div>
+                        <span class="px-2 py-0.5 rounded text-[9px] uppercase font-bold tracking-wider bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                            Baseline Model
+                        </span>
+                    </div>
+
+                    <!-- Avatars Display -->
+                    <div class="flex gap-4 mb-6">
+                        <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-900">
+                            <span class="w-7 h-7 rounded-full bg-rose-500/20 flex items-center justify-center text-xs text-rose-400 border border-rose-500/30">
+                                <i class="fa-solid fa-user-ninja"></i>
+                            </span>
+                            <div>
+                                <span class="block text-[8px] uppercase text-slate-500 font-bold">Operator</span>
+                                <span class="text-[10px] text-slate-300 font-semibold">DevOps Engineer</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-900">
+                            <span class="w-7 h-7 rounded-full bg-slate-700/30 flex items-center justify-center text-xs text-slate-400 border border-slate-700/30">
+                                <i class="fa-solid fa-user-tie"></i>
+                            </span>
+                            <div>
+                                <span class="block text-[8px] uppercase text-slate-500 font-bold">Approver</span>
+                                <span class="text-[10px] text-slate-300 font-semibold">Ops Manager</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-900">
+                            <span class="w-7 h-7 rounded-full bg-slate-700/30 flex items-center justify-center text-xs text-slate-400 border border-slate-700/30">
+                                <i class="fa-solid fa-server"></i>
+                            </span>
+                            <div>
+                                <span class="block text-[8px] uppercase text-slate-500 font-bold">Target</span>
+                                <span class="text-[10px] text-slate-300 font-semibold">Cloud Infra</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pipeline Canvas/Visual Container -->
+                    <div class="relative rounded-2xl border border-rose-900/20 bg-slate-950 p-4 min-h-[160px] flex items-center">
+                        <div class="grid grid-cols-5 gap-3 w-full relative z-10">
+                            <!-- Node 1 -->
+                            <div class="pipeline-node group relative p-3 rounded-xl border border-slate-900 bg-slate-900/40 text-center hover:border-rose-500/30 transition-all cursor-help" data-node="b1">
+                                <div class="node-status-dot absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></div>
+                                <i class="fa-solid fa-envelope text-rose-400 text-lg mb-2"></i>
+                                <span class="block text-[9px] font-bold text-slate-300">1. Email Ticket</span>
+                                <div class="tooltip opacity-0 group-hover:opacity-100 pointer-events-none absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 p-2 rounded bg-slate-900 border border-slate-850 text-[9px] text-slate-400 text-left shadow-2xl transition-opacity z-50">
+                                    <strong class="text-slate-200 block mb-0.5">Ticket Intake</strong>
+                                    Manual review of request details, parsing parameters from freeform emails.
+                                </div>
+                            </div>
+                            <!-- Node 2 -->
+                            <div class="pipeline-node group relative p-3 rounded-xl border border-slate-900 bg-slate-900/40 text-center hover:border-rose-500/30 transition-all cursor-help" data-node="b2">
+                                <div class="node-status-dot absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-yellow-500 animate-pulse"></div>
+                                <i class="fa-solid fa-code text-orange-400 text-lg mb-2"></i>
+                                <span class="block text-[9px] font-bold text-slate-300">2. Manual HCL</span>
+                                <div class="tooltip opacity-0 group-hover:opacity-100 pointer-events-none absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 p-2 rounded bg-slate-900 border border-slate-850 text-[9px] text-slate-400 text-left shadow-2xl transition-opacity z-50">
+                                    <strong class="text-slate-200 block mb-0.5">Terraform Scripting</strong>
+                                    Writing Terraform configuration blocks (.tf files) manually, leading to variable type mismatches.
+                                </div>
+                            </div>
+                            <!-- Node 3 -->
+                            <div class="pipeline-node group relative p-3 rounded-xl border border-slate-900 bg-slate-900/40 text-center hover:border-rose-500/30 transition-all cursor-help" data-node="b3">
+                                <div class="node-status-dot absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-slate-600"></div>
+                                <i class="fa-solid fa-shield-halved text-slate-400 text-lg mb-2"></i>
+                                <span class="block text-[9px] font-bold text-slate-300">3. Policy Check</span>
+                                <div class="tooltip opacity-0 group-hover:opacity-100 pointer-events-none absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 p-2 rounded bg-slate-900 border border-slate-850 text-[9px] text-slate-400 text-left shadow-2xl transition-opacity z-50">
+                                    <strong class="text-slate-200 block mb-0.5">Manual Validation</strong>
+                                    Checking spreadsheet records for budget availability and security access lists.
+                                </div>
+                            </div>
+                            <!-- Node 4 -->
+                            <div class="pipeline-node group relative p-3 rounded-xl border border-slate-900 bg-slate-900/40 text-center hover:border-rose-500/30 transition-all cursor-help" data-node="b4">
+                                <div class="node-status-dot absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-slate-600"></div>
+                                <i class="fa-solid fa-terminal text-slate-400 text-lg mb-2"></i>
+                                <span class="block text-[9px] font-bold text-slate-300">4. CLI Apply</span>
+                                <div class="tooltip opacity-0 group-hover:opacity-100 pointer-events-none absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 p-2 rounded bg-slate-900 border border-slate-850 text-[9px] text-slate-400 text-left shadow-2xl transition-opacity z-50">
+                                    <strong class="text-slate-200 block mb-0.5">Terraform CLI Execution</strong>
+                                    Running terraform apply from CLI, locking state file and blocking other runs.
+                                </div>
+                            </div>
+                            <!-- Node 5 -->
+                            <div class="pipeline-node group relative p-3 rounded-xl border border-slate-900 bg-slate-900/40 text-center hover:border-rose-500/30 transition-all cursor-help" data-node="b5">
+                                <div class="node-status-dot absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-slate-600"></div>
+                                <i class="fa-solid fa-bug text-slate-400 text-lg mb-2"></i>
+                                <span class="block text-[9px] font-bold text-slate-300">5. Manual Debug</span>
+                                <div class="tooltip opacity-0 group-hover:opacity-100 pointer-events-none absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 p-2 rounded bg-slate-900 border border-slate-850 text-[9px] text-slate-400 text-left shadow-2xl transition-opacity z-50">
+                                    <strong class="text-slate-200 block mb-0.5">Error & Rework</strong>
+                                    Checking logs manually on servers to identify variables misconfigurations.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Flow canvas overlay for animation -->
+                        <canvas id="canvas-flow-baseline" class="absolute inset-0 w-full h-full pointer-events-none z-0"></canvas>
+                    </div>
+
+                    <!-- Additional Interactive Action Triggers -->
+                    <div class="flex flex-wrap gap-2.5 mt-4">
+                        <button onclick="openVisOverlay('blueprint', false)" class="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-900 hover:border-rose-500/30 text-[10px] font-bold text-slate-400 hover:text-rose-400 transition-all flex items-center gap-1.5">
+                            <i class="fa-solid fa-bezier-curve"></i> Fig 5.6 Service Blueprint
+                        </button>
+                        <button onclick="openVisOverlay('qfd', false)" class="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-900 hover:border-rose-500/30 text-[10px] font-bold text-slate-400 hover:text-rose-400 transition-all flex items-center gap-1.5">
+                            <i class="fa-solid fa-table-cells"></i> QFD / House of Quality Matrix
+                        </button>
+                        <button onclick="openVisOverlay('queue', false)" class="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-900 hover:border-rose-500/30 text-[10px] font-bold text-slate-400 hover:text-rose-400 transition-all flex items-center gap-1.5">
+                            <i class="fa-solid fa-users-rectangle"></i> Animate Queue Dynamics
+                        </button>
+                    </div>
+
+                    <!-- Controls and Live Metrics -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6 pt-4 border-t border-slate-900">
+                        <div class="flex items-center gap-3">
+                            <button id="btn-baseline-simulate" class="px-4 py-2.5 rounded-xl bg-rose-500 hover:bg-rose-600 text-slate-950 text-xs font-bold uppercase transition-all tracking-wider flex items-center gap-2">
+                                <i class="fa-solid fa-play"></i> Simulate Request
+                            </button>
+                            <span id="txt-baseline-sla" class="text-xs font-mono text-slate-500">Time Elapsed: 0.0 Hours</span>
+                        </div>
+                        <div class="grid grid-cols-4 gap-2 text-center font-mono">
+                            <div class="bg-slate-950/60 p-2 rounded-xl border border-slate-900">
+                                <span class="block text-[7px] uppercase text-slate-500 font-extrabold">Lead Time</span>
+                                <span class="text-rose-400 font-bold text-xs">High</span>
+                            </div>
+                            <div class="bg-slate-950/60 p-2 rounded-xl border border-slate-900">
+                                <span class="block text-[7px] uppercase text-slate-500 font-extrabold">Error Rate</span>
+                                <span class="text-rose-400 font-bold text-xs">High</span>
+                            </div>
+                            <div class="bg-slate-950/60 p-2 rounded-xl border border-slate-900">
+                                <span class="block text-[7px] uppercase text-slate-500 font-extrabold">Efficiency</span>
+                                <span class="text-rose-400 font-bold text-xs">Low</span>
+                            </div>
+                            <div class="bg-slate-950/60 p-2 rounded-xl border border-slate-900">
+                                <span class="block text-[7px] uppercase text-slate-500 font-extrabold">Effort Index</span>
+                                <span class="text-rose-400 font-bold text-xs">Severe</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- PAGE 2: MODERN AI-DRIVEN ORCHESTRATION -->
+            <main id="page-agentic" class="hidden flex flex-col gap-6 animate-fade">
+                <div class="glass-card p-5 rounded-3xl border border-emerald-950/20 bg-slate-900/10 shadow-2xl relative">
+                    <!-- Section Title -->
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h3 class="font-outfit text-base font-bold text-emerald-300 flex items-center gap-2">
+                                <i class="fa-solid fa-robot text-emerald-400"></i>
+                                Autonomous AI + Cloudify & Terraform Pipeline
+                            </h3>
+                            <p class="text-slate-500 text-[10px] uppercase font-bold tracking-wider">Natural Language Intent to Blueprint Orchestration</p>
+                        </div>
+                        <span class="px-2 py-0.5 rounded text-[9px] uppercase font-bold tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                            Novel Paradigm
+                        </span>
+                    </div>
+
+                    <!-- Avatars Display -->
+                    <div class="flex gap-4 mb-6">
+                        <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-900">
+                            <span class="w-7 h-7 rounded-full bg-slate-700/30 flex items-center justify-center text-xs text-slate-400 border border-slate-700/30">
+                                <i class="fa-solid fa-circle-user"></i>
+                            </span>
+                            <div>
+                                <span class="block text-[8px] uppercase text-slate-500 font-bold">Requestor</span>
+                                <span class="text-[10px] text-slate-300 font-semibold">End User</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-900">
+                            <span class="w-7 h-7 rounded-full bg-emerald-500/20 flex items-center justify-center text-xs text-emerald-400 border border-emerald-500/30">
+                                <i class="fa-solid fa-microchip"></i>
+                            </span>
+                            <div>
+                                <span class="block text-[8px] uppercase text-slate-500 font-bold">Orchestrator</span>
+                                <span class="text-[10px] text-slate-300 font-semibold">AI Agent</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-900">
+                            <span class="w-7 h-7 rounded-full bg-cyan-500/20 flex items-center justify-center text-xs text-cyan-400 border border-cyan-500/30">
+                                <i class="fa-solid fa-network-wired"></i>
+                            </span>
+                            <div>
+                                <span class="block text-[8px] uppercase text-slate-500 font-bold">Engine</span>
+                                <span class="text-[10px] text-slate-300 font-semibold">Cloudify / TF</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pipeline Canvas/Visual Container -->
+                    <div class="relative rounded-2xl border border-emerald-900/20 bg-slate-950 p-4 min-h-[160px] flex items-center">
+                        <div class="grid grid-cols-5 gap-3 w-full relative z-10">
+                            <!-- Node 1 -->
+                            <div class="pipeline-node group relative p-3 rounded-xl border border-slate-900 bg-slate-900/40 text-center hover:border-emerald-500/30 transition-all cursor-help" data-node="a1">
+                                <div class="node-status-dot absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                                <i class="fa-solid fa-message text-emerald-400 text-lg mb-2"></i>
+                                <span class="block text-[9px] font-bold text-slate-300">1. Prompt Input</span>
+                                <div class="tooltip opacity-0 group-hover:opacity-100 pointer-events-none absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 p-2 rounded bg-slate-900 border border-slate-850 text-[9px] text-slate-400 text-left shadow-2xl transition-opacity z-50">
+                                    <strong class="text-slate-200 block mb-0.5">Intent Intake</strong>
+                                    Receiving natural language prompt requesting containerized workspace deployment.
+                                </div>
+                            </div>
+                            <!-- Node 2 -->
+                            <div class="pipeline-node group relative p-3 rounded-xl border border-slate-900 bg-slate-900/40 text-center hover:border-emerald-500/30 transition-all cursor-help" data-node="a2">
+                                <div class="node-status-dot absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-slate-600"></div>
+                                <i class="fa-solid fa-brain text-slate-400 text-lg mb-2"></i>
+                                <span class="block text-[9px] font-bold text-slate-300">2. Agent Parsing</span>
+                                <div class="tooltip opacity-0 group-hover:opacity-100 pointer-events-none absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 p-2 rounded bg-slate-900 border border-slate-850 text-[9px] text-slate-400 text-left shadow-2xl transition-opacity z-50">
+                                    <strong class="text-slate-200 block mb-0.5">LLM Structuring</strong>
+                                    AI Agent processes prompt parameters, mapping requirements to standard Cloudify blueprints.
+                                </div>
+                            </div>
+                            <!-- Node 3 -->
+                            <div class="pipeline-node group relative p-3 rounded-xl border border-slate-900 bg-slate-900/40 text-center hover:border-emerald-500/30 transition-all cursor-help" data-node="a3">
+                                <div class="node-status-dot absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-slate-600"></div>
+                                <i class="fa-solid fa-shield-halved text-slate-400 text-lg mb-2"></i>
+                                <span class="block text-[9px] font-bold text-slate-300">3. Policy Engine</span>
+                                <div class="tooltip opacity-0 group-hover:opacity-100 pointer-events-none absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 p-2 rounded bg-slate-900 border border-slate-850 text-[9px] text-slate-400 text-left shadow-2xl transition-opacity z-50">
+                                    <strong class="text-slate-200 block mb-0.5">Automated Guardrails</strong>
+                                    Real-time API check for quotas, compliance restrictions, and project budget bounds.
+                                </div>
+                            </div>
+                            <!-- Node 4 -->
+                            <div class="pipeline-node group relative p-3 rounded-xl border border-slate-900 bg-slate-900/40 text-center hover:border-emerald-500/30 transition-all cursor-help" data-node="a4">
+                                <div class="node-status-dot absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-slate-600"></div>
+                                <i class="fa-solid fa-sliders text-slate-400 text-lg mb-2"></i>
+                                <span class="block text-[9px] font-bold text-slate-300">4. Cloudify Orchestrate</span>
+                                <div class="tooltip opacity-0 group-hover:opacity-100 pointer-events-none absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 p-2 rounded bg-slate-900 border border-slate-850 text-[9px] text-slate-400 text-left shadow-2xl transition-opacity z-50">
+                                    <strong class="text-slate-200 block mb-0.5">Cloudify / Terraform Apply</strong>
+                                    REST API call triggered by AI Agent; Cloudify initiates deployment using Terraform provider.
+                                </div>
+                            </div>
+                            <!-- Node 5 -->
+                            <div class="pipeline-node group relative p-3 rounded-xl border border-slate-900 bg-slate-900/40 text-center hover:border-emerald-500/30 transition-all cursor-help" data-node="a5">
+                                <div class="node-status-dot absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-slate-600"></div>
+                                <i class="fa-solid fa-heart-pulse text-slate-400 text-lg mb-2"></i>
+                                <span class="block text-[9px] font-bold text-slate-300">5. Self-Healing</span>
+                                <div class="tooltip opacity-0 group-hover:opacity-100 pointer-events-none absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 p-2 rounded bg-slate-900 border border-slate-850 text-[9px] text-slate-400 text-left shadow-2xl transition-opacity z-50">
+                                    <strong class="text-slate-200 block mb-0.5">Autonomic Control</strong>
+                                    Continuous telemetry loops. Orchestration engine auto-recovers nodes if verification logs indicate failure.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Flow canvas overlay for animation -->
+                        <canvas id="canvas-flow-agentic" class="absolute inset-0 w-full h-full pointer-events-none z-0"></canvas>
+                    </div>
+
+                    <!-- Additional Interactive Action Triggers -->
+                    <div class="flex flex-wrap gap-2.5 mt-4">
+                        <button onclick="openVisOverlay('blueprint', true)" class="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-900 hover:border-emerald-500/30 text-[10px] font-bold text-slate-400 hover:text-emerald-400 transition-all flex items-center gap-1.5">
+                            <i class="fa-solid fa-bezier-curve"></i> Fig 5.6 Service Blueprint
+                        </button>
+                        <button onclick="openVisOverlay('qfd', true)" class="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-900 hover:border-emerald-500/30 text-[10px] font-bold text-slate-400 hover:text-emerald-400 transition-all flex items-center gap-1.5">
+                            <i class="fa-solid fa-table-cells"></i> QFD / House of Quality Matrix
+                        </button>
+                        <button onclick="openVisOverlay('queue', true)" class="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-900 hover:border-emerald-500/30 text-[10px] font-bold text-slate-400 hover:text-emerald-400 transition-all flex items-center gap-1.5">
+                            <i class="fa-solid fa-bolt"></i> Animate AI Queue Dynamics
+                        </button>
+                    </div>
+
+                    <!-- Prompt Box & Execution Console -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6 pt-4 border-t border-slate-900">
+                        <div>
+                            <span class="block text-[9px] uppercase tracking-wider text-slate-500 font-extrabold mb-2">Natural Language Prompts</span>
+                            <div class="flex flex-wrap gap-2 mb-3">
+                                <button onclick="selectPromptPreset('Deploy downscaled staging VM for developer tests')" class="px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-850 hover:border-emerald-500/20 text-[9px] font-semibold text-slate-400 hover:text-slate-200 transition-all">Staging VM</button>
+                                <button onclick="selectPromptPreset('Scale up API gateways cluster')" class="px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-850 hover:border-emerald-500/20 text-[9px] font-semibold text-slate-400 hover:text-slate-200 transition-all">Scale API Cluster</button>
+                                <button onclick="selectPromptPreset('Teardown stale debug container workspace')" class="px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-850 hover:border-emerald-500/20 text-[9px] font-semibold text-slate-400 hover:text-slate-200 transition-all">Teardown Workspace</button>
+                            </div>
+                            <div class="flex gap-2">
+                                <input type="text" id="ipt-agent-prompt" placeholder="Ask AI Agent to deploy..." class="flex-1 bg-slate-950 border border-slate-900 rounded-xl px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-emerald-500/40">
+                                <button id="btn-agent-simulate" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-slate-950 text-xs font-bold uppercase transition-all tracking-wider">Submit</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Telemetry / Live Logging Console -->
+                        <div class="flex flex-col">
+                            <span class="block text-[9px] uppercase tracking-wider text-slate-500 font-extrabold mb-2">Execution Logs</span>
+                            <div id="div-agent-console" class="flex-1 bg-slate-950 border border-slate-900 rounded-xl p-3 font-mono text-[9px] text-slate-400 h-[100px] overflow-y-auto leading-normal">
+                                System ready. Awaiting prompt request.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Metrics -->
+                    <div class="grid grid-cols-4 gap-2 text-center font-mono mt-4 pt-3 border-t border-slate-950">
+                        <div class="bg-slate-950/60 p-2 rounded-xl border border-slate-900">
+                            <span class="block text-[7px] uppercase text-slate-500 font-extrabold">Lead Time</span>
+                            <span class="text-emerald-400 font-bold text-xs">Seconds</span>
+                        </div>
+                        <div class="bg-slate-950/60 p-2 rounded-xl border border-slate-900">
+                            <span class="block text-[7px] uppercase text-slate-500 font-extrabold">Error Rate</span>
+                            <span class="text-emerald-400 font-bold text-xs">Zero</span>
+                        </div>
+                        <div class="bg-slate-950/60 p-2 rounded-xl border border-slate-900">
+                            <span class="block text-[7px] uppercase text-slate-500 font-extrabold">Efficiency</span>
+                            <span class="text-emerald-400 font-bold text-xs">Optimal</span>
+                        </div>
+                        <div class="bg-slate-950/60 p-2 rounded-xl border border-slate-900">
+                            <span class="block text-[7px] uppercase text-slate-500 font-extrabold">Effort Index</span>
+                            <span class="text-emerald-400 font-bold text-xs">Minimal</span>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- PAGE 3: COMPREHENSIVE SOM COMPARATIVE MATRIX -->
+            <main id="page-comparison" class="hidden flex flex-col gap-6 animate-fade">
+                <div class="glass-card p-5 border border-slate-900 rounded-3xl bg-slate-900/10 shadow-2xl flex flex-col gap-4">
+                    <!-- Table Header -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-base font-bold font-outfit text-slate-200 uppercase tracking-wider">SOM Evaluation Framework Matrix</h2>
+                            <p class="text-slate-500 text-[10px] uppercase font-bold tracking-wider font-semibold">Strictly Qualitative Comparison (Cloudify/TF Orchestration Model)</p>
+                        </div>
+                    </div>
+
+                    <!-- Category filter pills -->
+                    <div class="flex flex-wrap gap-2 pt-2 border-t border-slate-900" id="matrix-filter-container">
+                        <button class="filter-pill active px-3 py-1 rounded-lg text-[9px] font-bold uppercase border transition-all duration-200" data-matrix-category="all">
+                            <i class="fa-solid fa-layer-group mr-1"></i> All Domains
+                        </button>
+                        <button class="filter-pill px-3 py-1 rounded-lg text-[9px] font-bold uppercase border transition-all duration-200" data-matrix-category="Service Process & System Design">
+                            Design
+                        </button>
+                        <button class="filter-pill px-3 py-1 rounded-lg text-[9px] font-bold uppercase border transition-all duration-200" data-matrix-category="Service Encounter">
+                            Encounter
+                        </button>
+                        <button class="filter-pill px-3 py-1 rounded-lg text-[9px] font-bold uppercase border transition-all duration-200" data-matrix-category="Service Layouts & Process Analysis">
+                            Layouts
+                        </button>
+                        <button class="filter-pill px-3 py-1 rounded-lg text-[9px] font-bold uppercase border transition-all duration-200" data-matrix-category="Service Quality & Process Control">
+                            Quality
+                        </button>
+                        <button class="filter-pill px-3 py-1 rounded-lg text-[9px] font-bold uppercase border transition-all duration-200" data-matrix-category="Measuring Service Productivity">
+                            Productivity
+                        </button>
+                        <button class="filter-pill px-3 py-1 rounded-lg text-[9px] font-bold uppercase border transition-all duration-200" data-matrix-category="Managing Waiting Lines & Queuing Theory">
+                            Queues
+                        </button>
+                        <button class="filter-pill px-3 py-1 rounded-lg text-[9px] font-bold uppercase border transition-all duration-200" data-matrix-category="Service Strategy & SLA Management">
+                            Strategy
+                        </button>
+                        <button class="filter-pill px-3 py-1 rounded-lg text-[9px] font-bold uppercase border transition-all duration-200" data-matrix-category="Technology-Driven Service Operations">
+                            Tech
+                        </button>
+                    </div>
+
+                    <!-- Comparison Table -->
+                    <div class="overflow-hidden border border-slate-900 rounded-2xl bg-slate-950/40">
+                        <div class="overflow-x-auto max-h-[380px]">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-950 text-[8px] text-slate-500 font-extrabold uppercase tracking-wider border-b border-slate-900">
+                                        <th class="py-2.5 px-3 w-[20%]">SOM Module & Dimension</th>
+                                        <th class="py-2.5 px-3 w-[27.5%] text-rose-400">Traditional Paradigm</th>
+                                        <th class="py-2.5 px-3 w-[27.5%] text-emerald-400">Orchestrated Paradigm</th>
+                                        <th class="py-2.5 px-3 w-[25%] text-cyan-400">Strategic Advantage</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-900 text-[10px] text-slate-300" id="matrix-tbody">
+                                    <!-- Dynamic content loaded via app.js -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Comparison Radar Chart -->
+                    <div class="mt-4 p-4 border border-slate-900 rounded-2xl bg-slate-950/20">
+                        <h4 class="text-xs font-bold font-outfit text-slate-200 uppercase tracking-wider mb-2"><i class="fa-solid fa-chart-pie text-cyan-400 mr-1.5"></i> Radar Attributes shift</h4>
+                        <div class="relative w-full h-[220px] flex items-center justify-center">
+                            <canvas id="radarChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Right: Global "SOM Module Explorer" Sidebar -->
+        <aside class="w-full lg:w-[280px] flex flex-col gap-4">
+            <div class="glass-card p-4 rounded-3xl border border-slate-900 bg-slate-900/10 shadow-2xl">
+                <h3 class="font-outfit text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">
+                    <i class="fa-solid fa-compass text-cyan-400 mr-1.5 animate-spin-slow"></i>
+                    SOM Module Explorer
+                </h3>
+                
+                <!-- List of Modules -->
+                <div class="flex flex-col gap-2 max-h-[480px] overflow-y-auto pr-1" id="som-explorer-list">
+                    <!-- Dynamic rendering -->
+                </div>
+            </div>
+        </aside>
+
+    </div>
+
+    <!-- GLOBAL SLIDING DRAWER OVERLAY -->
+    <div id="som-drawer" class="fixed inset-y-0 right-0 z-50 w-full sm:w-[440px] bg-slate-900/95 border-l border-slate-800 shadow-2xl backdrop-blur-md transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col">
+        <!-- Header -->
+        <div class="p-5 border-b border-slate-800 flex items-center justify-between">
+            <div>
+                <span class="inline-block text-[8px] uppercase tracking-wider text-slate-500 font-extrabold" id="drawer-category">Category</span>
+                <h3 class="font-outfit text-sm font-bold text-slate-100" id="drawer-title">Module Title</h3>
+            </div>
+            <button onclick="closeSOMDrawer()" class="text-slate-400 hover:text-slate-200 w-7 h-7 flex items-center justify-center rounded-full bg-slate-950 border border-slate-800">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- Body Content -->
+        <div class="p-5 flex-1 overflow-y-auto space-y-4 text-xs">
+            <!-- Inline Micro-Visual Container -->
+            <div id="drawer-micro-visual" class="bg-slate-950/80 p-3 rounded-2xl border border-slate-850 flex items-center justify-center">
+                <!-- SVG Diagram rendered dynamically by app.js -->
+            </div>
+
+            <!-- Aspect 1 -->
+            <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-850/50">
+                <h4 class="font-bold text-[10px] text-cyan-400 uppercase tracking-wider mb-1.5" id="drawer-aspect-1-title">Aspect 1</h4>
+                <div class="space-y-3">
+                    <div>
+                        <span class="text-[8px] uppercase font-bold text-rose-400 tracking-wider">Traditional Operational Paradigm:</span>
+                        <p class="text-slate-400 mt-0.5 leading-relaxed" id="drawer-aspect-1-trad">Details</p>
+                    </div>
+                    <div>
+                        <span class="text-[8px] uppercase font-bold text-emerald-400 tracking-wider">AI Agent + Cloudify Paradigm:</span>
+                        <p class="text-slate-300 mt-0.5 leading-relaxed" id="drawer-aspect-1-orchestrated">Details</p>
+                    </div>
+                    <div class="border-t border-slate-900 pt-2 mt-2">
+                        <span class="text-[8px] uppercase font-bold text-cyan-400 tracking-wider">Strategic Advantage:</span>
+                        <p class="text-slate-300 mt-0.5 leading-relaxed font-semibold" id="drawer-aspect-1-adv">Details</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aspect 2 -->
+            <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-850/50">
+                <h4 class="font-bold text-[10px] text-cyan-400 uppercase tracking-wider mb-1.5" id="drawer-aspect-2-title">Aspect 2</h4>
+                <div class="space-y-3">
+                    <div>
+                        <span class="text-[8px] uppercase font-bold text-rose-400 tracking-wider">Traditional Operational Paradigm:</span>
+                        <p class="text-slate-400 mt-0.5 leading-relaxed" id="drawer-aspect-2-trad">Details</p>
+                    </div>
+                    <div>
+                        <span class="text-[8px] uppercase font-bold text-emerald-400 tracking-wider">AI Agent + Cloudify Paradigm:</span>
+                        <p class="text-slate-300 mt-0.5 leading-relaxed" id="drawer-aspect-2-orchestrated">Details</p>
+                    </div>
+                    <div class="border-t border-slate-900 pt-2 mt-2">
+                        <span class="text-[8px] uppercase font-bold text-cyan-400 tracking-wider">Strategic Advantage:</span>
+                        <p class="text-slate-300 mt-0.5 leading-relaxed font-semibold" id="drawer-aspect-2-adv">Details</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aspect 3 -->
+            <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-850/50">
+                <h4 class="font-bold text-[10px] text-cyan-400 uppercase tracking-wider mb-1.5" id="drawer-aspect-3-title">Aspect 3</h4>
+                <div class="space-y-3">
+                    <div>
+                        <span class="text-[8px] uppercase font-bold text-rose-400 tracking-wider">Traditional Operational Paradigm:</span>
+                        <p class="text-slate-400 mt-0.5 leading-relaxed" id="drawer-aspect-3-trad">Details</p>
+                    </div>
+                    <div>
+                        <span class="text-[8px] uppercase font-bold text-emerald-400 tracking-wider">AI Agent + Cloudify Paradigm:</span>
+                        <p class="text-slate-300 mt-0.5 leading-relaxed" id="drawer-aspect-3-orchestrated">Details</p>
+                    </div>
+                    <div class="border-t border-slate-900 pt-2 mt-2">
+                        <span class="text-[8px] uppercase font-bold text-cyan-400 tracking-wider">Strategic Advantage:</span>
+                        <p class="text-slate-300 mt-0.5 leading-relaxed font-semibold" id="drawer-aspect-3-adv">Details</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ANIMATED INTERACTIVE OVERLAY MODAL FOR BLUEPRINT, QFD & QUEUEING -->
+    <div id="vis-overlay-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-md opacity-0 pointer-events-none transition-all duration-300">
+        <div class="glass-card max-w-4xl w-full mx-4 rounded-3xl overflow-hidden border border-slate-800 bg-slate-900/90 shadow-2xl relative flex flex-col max-h-[90vh]">
+            <!-- Close Button -->
+            <button id="vis-overlay-close" class="absolute top-4 right-4 text-slate-400 hover:text-slate-200 transition-colors w-8 h-8 flex items-center justify-center rounded-full bg-slate-950 border border-slate-800 z-50">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            
+            <!-- Modal Body -->
+            <div class="p-6 md:p-8 flex flex-col gap-6 overflow-y-auto">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <span id="vis-overlay-badge" class="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-rose-500/10 text-rose-400 border border-rose-500/20">Traditional Baseline</span>
+                        <h2 id="vis-overlay-title" class="font-outfit text-lg font-bold text-slate-100 mt-1">Interactive Service Blueprint</h2>
+                    </div>
+                </div>
+
+                <!-- Canvas container -->
+                <div class="flex-1 flex flex-col items-center justify-center bg-slate-950 rounded-2xl border border-slate-850 p-2 relative min-h-[380px]">
+                    <canvas id="vis-overlay-canvas" width="750" height="420" class="block w-full h-auto rounded-xl"></canvas>
+                </div>
+
+                <!-- Description box -->
+                <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-850 text-xs leading-relaxed" id="vis-overlay-desc">
+                    Explanation and formula details will be loaded here dynamically.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Application -->
+    <script src="app.js"></script>
+</body>
+</html>
