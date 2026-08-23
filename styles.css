@@ -1,4 +1,4 @@
-/* Services Operations Management Evaluation Style System */
+/* Services Operations Management Evaluation Style System - Light Theme */
 
 :root {
     --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
@@ -6,91 +6,103 @@
 }
 
 body {
-    background-color: #020617; /* Deep slate background */
+    background-color: #f8fafc; /* Light slate background */
     background-image: 
-        radial-gradient(at 0% 0%, hsla(244, 55%, 12%, 0.35) 0px, transparent 50%),
-        radial-gradient(at 100% 100%, hsla(160, 52%, 10%, 0.25) 0px, transparent 50%);
+        radial-gradient(at 0% 0%, rgba(224, 231, 255, 0.45) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(209, 250, 229, 0.35) 0px, transparent 50%);
     background-attachment: fixed;
+    color: #1e293b;
 }
 
 /* Scrollbars */
 ::-webkit-scrollbar {
-    width: 5px;
-    height: 5px;
+    width: 6px;
+    height: 6px;
 }
 ::-webkit-scrollbar-track {
-    background: rgba(15, 23, 42, 0.6);
+    background: #f1f5f9;
 }
 ::-webkit-scrollbar-thumb {
-    background: rgba(51, 65, 85, 0.4);
+    background: #cbd5e1;
     border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-    background: rgba(71, 85, 105, 0.7);
+    background: #94a3b8;
 }
 
-/* Glassmorphism Containers */
-.glass-card {
-    background: rgba(15, 23, 42, 0.45);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(51, 65, 85, 0.2);
-    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.8);
+/* Executive Light Theme Cards */
+.light-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 10px 30px -8px rgba(148, 163, 184, 0.22);
     transition: border-color var(--transition-normal), box-shadow var(--transition-normal);
 }
-.glass-card:hover {
-    border-color: rgba(71, 85, 105, 0.35);
+.light-card:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 14px 35px -10px rgba(148, 163, 184, 0.3);
 }
 
 /* Sticky top nav tab buttons */
 .nav-tab {
-    color: #94a3b8; /* slate-400 */
+    color: #64748b;
     border: 1px solid transparent;
 }
 .nav-tab.active {
-    background: rgba(30, 41, 59, 0.85); /* slate-800 */
-    color: #22d3ee; /* cyan-400 */
-    border-color: rgba(6, 182, 212, 0.25);
-    box-shadow: 0 4px 12px -2px rgba(6, 182, 212, 0.15);
+    background: #ffffff;
+    color: #0f172a;
+    border-color: #cbd5e1;
+    box-shadow: 0 2px 8px -1px rgba(148, 163, 184, 0.3);
 }
 .nav-tab:not(.active):hover {
-    color: #f1f5f9;
-    background: rgba(30, 41, 59, 0.3);
+    color: #0f172a;
+    background: rgba(255, 255, 255, 0.6);
+}
+
+/* Metric Toggle Switch Buttons */
+.metric-toggle-btn {
+    color: #64748b;
+}
+.metric-toggle-btn.active {
+    background: #ffffff;
+    color: #4338ca; /* indigo-700 */
+    box-shadow: 0 2px 6px -1px rgba(99, 102, 241, 0.25);
+    border: 1px solid #c7d2fe;
 }
 
 /* Category Filter Pills */
 .filter-pill {
-    background: rgba(15, 23, 42, 0.5);
-    border: 1px solid rgba(51, 65, 85, 0.4);
-    color: #94a3b8;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    color: #64748b;
 }
 .filter-pill:hover {
-    border-color: rgba(71, 85, 105, 0.6);
-    color: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #0f172a;
 }
 .filter-pill.active {
-    background: rgba(6, 182, 212, 0.1);
-    border-color: rgba(6, 182, 212, 0.4);
-    color: #22d3ee;
-    box-shadow: 0 0 12px -2px rgba(6, 182, 212, 0.15);
+    background: #eff6ff;
+    border-color: #93c5fd;
+    color: #1d4ed8;
+    box-shadow: 0 2px 8px -1px rgba(147, 197, 253, 0.3);
 }
 
 /* SOM Module Explorer Side Cards */
 .som-explorer-card {
-    background: rgba(15, 23, 42, 0.55);
-    border: 1px solid rgba(51, 65, 85, 0.15);
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
     cursor: pointer;
     transition: all var(--transition-normal);
 }
 .som-explorer-card:hover {
     transform: translateX(3px);
-    border-color: rgba(6, 182, 212, 0.35);
-    box-shadow: 0 4px 12px -3px rgba(6, 182, 212, 0.08);
+    border-color: #818cf8;
+    background: #ffffff;
+    box-shadow: 0 4px 12px -3px rgba(99, 102, 241, 0.15);
 }
 .som-explorer-card.active {
-    border-color: rgba(6, 182, 212, 0.5);
-    background: rgba(6, 182, 212, 0.05);
-    color: #22d3ee;
+    border-color: #6366f1;
+    background: #eef2ff;
+    color: #4338ca;
 }
 
 /* Pipeline Node Hover Tooltips */

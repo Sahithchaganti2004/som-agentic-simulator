@@ -4,18 +4,21 @@ import streamlit.components.v1 as components
 
 # Configure Streamlit page
 st.set_page_config(
-    page_title="AI Agent & Cloudify/Terraform Orchestration: SOM Simulator",
-    page_icon="🤖",
+    page_title="Autonomous DevEaaS vs. Traditional IT Operations: SOM Evaluation",
+    page_icon="🎓",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# Custom Streamlit CSS to remove default padding and header for full-screen SaaS UI
+# Custom Streamlit CSS to remove padding and ensure seamless light-theme rendering
 st.markdown("""
     <style>
         #MainMenu {visibility: hidden;}
         footer {visibility: hidden;}
         header {visibility: hidden;}
+        .stApp {
+            background-color: #f8fafc !important;
+        }
         .block-container {
             padding-top: 0rem !important;
             padding-bottom: 0rem !important;
@@ -33,7 +36,6 @@ st.markdown("""
 # Determine path directory
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Read source files
 index_path = os.path.join(BASE_DIR, "index.html")
 styles_path = os.path.join(BASE_DIR, "styles.css")
 js_path = os.path.join(BASE_DIR, "app.js")
@@ -57,4 +59,4 @@ html_bundled = html_content.replace(
 )
 
 # Render full height interactive application component
-components.html(html_bundled, height=1050, scrolling=True)
+components.html(html_bundled, height=1100, scrolling=True)

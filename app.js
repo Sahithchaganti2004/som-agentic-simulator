@@ -1,8 +1,107 @@
 // Services Operations Management Simulator & Orchestration Engine
 
 // ==========================================
-// 1. DATA DATABASE: 24 QUALITATIVE POINTS
+// 1. DATA DATABASE: 24 QUALITATIVE & 8 QUANTITATIVE METRICS
 // ==========================================
+const somQuantitativeMetrics = [
+    {
+        domain: "Managing Waiting Lines & Queuing Theory",
+        module: "Queuing & Waiting Lines",
+        metric: "Mean Wait Time (Wq)",
+        baseline: "18.5 Hours",
+        baselineRaw: 18.5 * 60, // minutes
+        agentic: "< 1.2 Minutes",
+        agenticRaw: 1.2, // minutes
+        formula: "Wq = λ / (μ * (μ - λ)) [M/M/1 Model]",
+        gain: "+98.9% Reduction",
+        pctGain: 98.9
+    },
+    {
+        domain: "Managing Waiting Lines & Queuing Theory",
+        module: "Queuing & Waiting Lines",
+        metric: "Queue Length (Lq)",
+        baseline: "45 Requests",
+        baselineRaw: 45,
+        agentic: "0 Requests",
+        agenticRaw: 0,
+        formula: "Lq = λ * Wq [Little's Law]",
+        gain: "-100% Backlog",
+        pctGain: 100.0
+    },
+    {
+        domain: "Measuring Service Productivity",
+        module: "Service Productivity",
+        metric: "DEA Efficiency (θ)",
+        baseline: "θ = 0.54 (Sub-Optimal)",
+        baselineRaw: 0.54,
+        agentic: "θ = 1.00 (Optimal Frontier)",
+        agenticRaw: 1.00,
+        formula: "Max θ = Σ(u_r * y_r) / Σ(v_i * x_i) [DEA]",
+        gain: "+85.2% Yield",
+        pctGain: 85.2
+    },
+    {
+        domain: "Service Quality & Process Control",
+        module: "Process Control & Six Sigma",
+        metric: "Straight-Through Processing (STP)",
+        baseline: "28% (Manual Lags)",
+        baselineRaw: 28,
+        agentic: "94% (Zero-Touch)",
+        agenticRaw: 94,
+        formula: "STP % = (Autonomous / Total) * 100",
+        gain: "+235.7% STP Gain",
+        pctGain: 235.7
+    },
+    {
+        domain: "Service Quality & Process Control",
+        module: "Process Control & Six Sigma",
+        metric: "Defect Rate / DPMO",
+        baseline: "42,000 DPMO (3.2σ)",
+        baselineRaw: 42000,
+        agentic: "3.4 DPMO (6.0σ)",
+        agenticRaw: 3.4,
+        formula: "DPMO = (Errors / (Units * Opps)) * 10^6",
+        gain: "-99.9% Defect Drop",
+        pctGain: 99.9
+    },
+    {
+        domain: "Service Quality & Process Control",
+        module: "Service Recovery & Day-2",
+        metric: "Mean Time to Resolution (MTTR)",
+        baseline: "140 Minutes",
+        baselineRaw: 140,
+        agentic: "< 90 Seconds",
+        agenticRaw: 1.5, // minutes
+        formula: "MTTR = Σ(Down Time) / Incident Count",
+        gain: "+98.9% Speedup",
+        pctGain: 98.9
+    },
+    {
+        domain: "Service Encounter",
+        module: "Service Quality (SERVQUAL)",
+        metric: "Unweighted SERVQUAL Gap (Q)",
+        baseline: "Q = -2.35 (Dissatisfied)",
+        baselineRaw: -2.35,
+        agentic: "Q = +0.82 (Exceeds Expectations)",
+        agenticRaw: 0.82,
+        formula: "Q = Σ(P_i - E_i) / N [Perception - Expectation]",
+        gain: "+134.9% Perception",
+        pctGain: 134.9
+    },
+    {
+        domain: "Measuring Service Productivity",
+        module: "Capacity & Yield Management",
+        metric: "Zombie Cloud Resource Waste",
+        baseline: "34% Monthly Spend",
+        baselineRaw: 34,
+        agentic: "< 2% Monthly Spend",
+        agenticRaw: 2,
+        formula: "Waste % = (Idle Cost / Total Spend) * 100",
+        gain: "-94.1% Cost Savings",
+        pctGain: 94.1
+    }
+];
+
 const somDatabase = [
     // Service Process & System Design
     {
@@ -194,18 +293,20 @@ const somDatabase = [
 // ==========================================
 let activeTab = "baseline"; // baseline | agentic | comparison
 let matrixFilterCategory = "all";
+let metricDisplayMode = "raw"; // raw | percentage
 let radarChartInstance = null;
+let barChartInstance = null;
 
 // Pipeline Simulation States
 let baselineSimActive = false;
 let agenticSimActive = false;
 let baselineProgress = 0;
 let agenticProgress = 0;
-let baselineSlaTimer = 0;
+let baselineWqCounter = 18.5; // Hours
 let baselineTimerInterval = null;
 
 // Interactive Overlay Modal State
-let overlayVisType = 'blueprint'; // blueprint | qfd | queue
+let overlayVisType = 'blueprint'; // blueprint | qfd | queue | dea
 let overlayVisAgentic = false;
 let overlayOpen = false;
 let overlayAnimId = null;
@@ -226,8 +327,9 @@ let agenticServers = [
 ];
 let agenticTotalProcessed = 0;
 
-// Blueprint animation variable
+// Blueprint & DEA animation variables
 let blueprintT = 0;
+let deaPointProgress = 0;
 
 // ==========================================
 // 3. INITIALIZATION & NAVIGATION BINDING
@@ -237,6 +339,10 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("nav-btn-baseline").addEventListener("click", () => switchTab("baseline"));
     document.getElementById("nav-btn-agentic").addEventListener("click", () => switchTab("agentic"));
     document.getElementById("nav-btn-comparison").addEventListener("click", () => switchTab("comparison"));
+
+    // Metric Mode Toggle Controls (Page 3)
+    document.getElementById("btn-metric-raw").addEventListener("click", () => switchMetricMode("raw"));
+    document.getElementById("btn-metric-pct").addEventListener("click", () => switchMetricMode("percentage"));
 
     // Pipeline Simulators
     document.getElementById("btn-baseline-simulate").addEventListener("click", startBaselineSimulation);
@@ -262,9 +368,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     renderExplorerList();
     renderMatrixTable();
+    initBarChart();
     initRadarChart();
 
-    // Start frames
+    // Start frame loop
     requestAnimationFrame(animationLoop);
 });
 
@@ -286,7 +393,24 @@ function switchTab(tabId) {
         document.getElementById("nav-btn-comparison").classList.add("active");
         document.getElementById("page-comparison").classList.remove("hidden");
         if (radarChartInstance) radarChartInstance.resize();
+        if (barChartInstance) barChartInstance.resize();
     }
+}
+
+function switchMetricMode(mode) {
+    metricDisplayMode = mode;
+    document.getElementById("btn-metric-raw").classList.remove("active");
+    document.getElementById("btn-metric-pct").classList.remove("active");
+
+    if (mode === "raw") {
+        document.getElementById("btn-metric-raw").classList.add("active");
+        document.getElementById("bar-chart-mode-label").textContent = "Raw Values";
+    } else {
+        document.getElementById("btn-metric-pct").classList.add("active");
+        document.getElementById("bar-chart-mode-label").textContent = "% Improvement Gain";
+    }
+
+    updateBarChart();
 }
 
 // ==========================================
@@ -300,22 +424,22 @@ function renderExplorerList() {
 
     uniqueModules.forEach(modName => {
         const itemEl = document.createElement("div");
-        itemEl.className = "som-explorer-card p-3 rounded-2xl text-xs font-semibold text-slate-350 hover:text-slate-100 flex items-center justify-between cursor-pointer transition-all";
+        itemEl.className = "som-explorer-card p-3 rounded-2xl text-xs font-semibold text-slate-700 hover:text-slate-900 flex items-center justify-between cursor-pointer transition-all";
         
-        let iconHtml = "<i class='fa-solid fa-bezier-curve text-cyan-400'></i>";
-        if (modName.includes("Encounter")) iconHtml = "<i class='fa-solid fa-people-arrows text-cyan-400'></i>";
-        if (modName.includes("Quality")) iconHtml = "<i class='fa-solid fa-circle-check text-cyan-400'></i>";
-        if (modName.includes("Productivity")) iconHtml = "<i class='fa-solid fa-chart-line text-cyan-400'></i>";
-        if (modName.includes("Lines")) iconHtml = "<i class='fa-solid fa-users text-cyan-400'></i>";
-        if (modName.includes("Strategy")) iconHtml = "<i class='fa-solid fa-crosshairs text-cyan-400'></i>";
-        if (modName.includes("Technology")) iconHtml = "<i class='fa-solid fa-microchip text-cyan-400'></i>";
+        let iconHtml = "<i class='fa-solid fa-bezier-curve text-indigo-600'></i>";
+        if (modName.includes("Encounter")) iconHtml = "<i class='fa-solid fa-people-arrows text-cyan-600'></i>";
+        if (modName.includes("Quality")) iconHtml = "<i class='fa-solid fa-circle-check text-emerald-600'></i>";
+        if (modName.includes("Productivity")) iconHtml = "<i class='fa-solid fa-chart-line text-indigo-600'></i>";
+        if (modName.includes("Lines")) iconHtml = "<i class='fa-solid fa-users text-rose-600'></i>";
+        if (modName.includes("Strategy")) iconHtml = "<i class='fa-solid fa-crosshairs text-indigo-600'></i>";
+        if (modName.includes("Technology")) iconHtml = "<i class='fa-solid fa-microchip text-cyan-600'></i>";
 
         itemEl.innerHTML = `
             <div class="flex items-center gap-2 pointer-events-none">
                 ${iconHtml}
                 <span>${modName}</span>
             </div>
-            <i class="fa-solid fa-chevron-right text-[10px] text-slate-500 pointer-events-none"></i>
+            <i class="fa-solid fa-chevron-right text-[10px] text-slate-400 pointer-events-none"></i>
         `;
         
         itemEl.addEventListener("click", () => openSOMDrawer(modName));
@@ -329,11 +453,10 @@ function openSOMDrawer(modName) {
     const category = document.getElementById("drawer-category");
 
     title.textContent = modName;
-    category.textContent = "SOM Module Detail Context";
+    category.textContent = "SOM Domain Evaluation Context";
 
     const items = somDatabase.filter(d => d.module === modName);
     
-    // Bind Micro Visual
     renderDrawerMicroVisual(modName);
 
     // Bind Aspect 1
@@ -374,25 +497,22 @@ function renderDrawerMicroVisual(modName) {
     const container = document.getElementById("drawer-micro-visual");
     container.innerHTML = `
         <svg width="340" height="60" viewBox="0 0 340 60" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto">
-            <!-- Traditional Block -->
-            <rect x="10" y="10" width="130" height="40" rx="8" fill="#0f172a" stroke="#f43f5e" stroke-width="1.5" stroke-dasharray="3 3"/>
-            <text x="75" y="28" fill="#f43f5e" font-size="9" font-family="Outfit" font-weight="bold" text-anchor="middle">TRADITIONAL</text>
-            <text x="75" y="40" fill="#94a3b8" font-size="8" font-family="Outfit" text-anchor="middle">Manual Lags & Drift</text>
+            <rect x="10" y="10" width="130" height="40" rx="8" fill="#ffffff" stroke="#f43f5e" stroke-width="1.5" stroke-dasharray="3 3"/>
+            <text x="75" y="27" fill="#e11d48" font-size="9" font-family="Outfit" font-weight="bold" text-anchor="middle">BASELINE STATE</text>
+            <text x="75" y="40" fill="#64748b" font-size="8" font-family="Outfit" text-anchor="middle">Manual Lags & Congestion</text>
             
-            <!-- Arrow -->
-            <path d="M150 30H185" stroke="#38bdf8" stroke-width="2" stroke-dasharray="2 2"/>
-            <polygon points="187,30 180,26 180,34" fill="#38bdf8"/>
+            <path d="M150 30H185" stroke="#4338ca" stroke-width="2" stroke-dasharray="2 2"/>
+            <polygon points="187,30 180,26 180,34" fill="#4338ca"/>
             
-            <!-- Orchestrated Block -->
-            <rect x="195" y="10" width="135" height="40" rx="8" fill="#0f172a" stroke="#10b981" stroke-width="1.5"/>
-            <text x="262" y="28" fill="#10b981" font-size="9" font-family="Outfit" font-weight="bold" text-anchor="middle">AI + ORCHESTRATION</text>
-            <text x="262" y="40" fill="#94a3b8" font-size="8" font-family="Outfit" text-anchor="middle">Automated & Elastic</text>
+            <rect x="195" y="10" width="135" height="40" rx="8" fill="#ffffff" stroke="#10b981" stroke-width="1.5"/>
+            <text x="262" y="27" fill="#047857" font-size="9" font-family="Outfit" font-weight="bold" text-anchor="middle">AGENTIC EAAS</text>
+            <text x="262" y="40" fill="#64748b" font-size="8" font-family="Outfit" text-anchor="middle">Zero-Touch & θ = 1.00</text>
         </svg>
     `;
 }
 
 // ==========================================
-// 5. INTERACTIVE VISUALIZATION OVERLAYS (MODALS)
+// 5. INTERACTIVE OVERLAY MODALS (BLUEPRINT, QFD, QUEUE, DEA)
 // ==========================================
 function openVisOverlay(type, isAgentic) {
     overlayVisType = type;
@@ -407,67 +527,63 @@ function openVisOverlay(type, isAgentic) {
     modal.classList.remove("opacity-0", "pointer-events-none");
 
     if (isAgentic) {
-        badge.className = "px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
-        badge.textContent = "AI Agent + Cloudify / Terraform";
+        badge.className = "px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-300";
+        badge.textContent = "Agentic DevEaaS State (Page 2)";
     } else {
-        badge.className = "px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-rose-500/10 text-rose-400 border border-rose-500/20";
-        badge.textContent = "Traditional Manual Operations";
+        badge.className = "px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-rose-100 text-rose-800 border border-rose-300";
+        badge.textContent = "Traditional Baseline State (Page 1)";
     }
 
     if (type === 'blueprint') {
         title.textContent = "Textbook Figure 5.6 Service Blueprint (5 Swimlanes)";
-        if (isAgentic) {
-            desc.innerHTML = `
-                <strong>AI-Orchestrated 5-Swimlane Service Blueprint:</strong><br/>
-                - <em>Layer 1 (Physical Evidence):</em> Conversational UI & live execution logs.<br/>
-                - <em>Layer 2 (Customer Actions):</em> User submits natural language prompt -> Instant VM endpoint.<br/>
-                - <em>Layer 3 (Onstage Actions):</em> AI Agent Chatbot intent validation.<br/>
-                - <em>Layer 4 (Backstage Actions):</em> AI selects Cloudify blueprints & auto-generates Terraform graphs.<br/>
-                - <em>Layer 5 (Support Processes):</em> Cloudify Orchestrator REST API, automated IAM checks & budget engine.
-            `;
-        } else {
-            desc.innerHTML = `
-                <strong>Traditional 5-Swimlane Service Blueprint:</strong><br/>
-                - <em>Layer 1 (Physical Evidence):</em> Email ticketing portal & static cloud console.<br/>
-                - <em>Layer 2 (Customer Actions):</em> User files request ticket -> Long wait times.<br/>
-                - <em>Layer 3 (Onstage Actions):</em> DevOps engineer reads ticket & sends manual emails.<br/>
-                - <em>Layer 4 (Backstage Actions):</em> Engineer manually edits HCL scripts & CLI syntax checks.<br/>
-                - <em>Layer 5 (Support Processes):</em> ITSM database lookup & spreadsheet budget checks.
-            `;
-        }
+        desc.innerHTML = isAgentic ? `
+            <strong>AI-Orchestrated Service Blueprint (Fig 5.6):</strong> Zero human handoff barriers.<br/>
+            - <em>Layer 1 (Physical Evidence):</em> Conversational UI & live execution logs.<br/>
+            - <em>Layer 2 (Customer Actions):</em> Natural language prompt submission.<br/>
+            - <em>Layer 3 (Onstage Actions):</em> AI Agent Chatbot intent validation.<br/>
+            - <em>Layer 4 (Backstage Actions):</em> Dynamic Cloudify blueprint & Terraform execution graph generation.<br/>
+            - <em>Layer 5 (Support Processes):</em> Cloudify Orchestrator REST API, automated IAM & budget policy engine.
+        ` : `
+            <strong>Traditional Service Blueprint (Fig 5.6):</strong> Lags and manual handoffs.<br/>
+            - <em>Layer 1 (Physical Evidence):</em> Email ticketing portal & static cloud console.<br/>
+            - <em>Layer 2 (Customer Actions):</em> Manual ticket submission -> Long wait loops.<br/>
+            - <em>Layer 3 (Onstage Actions):</em> DevOps engineer reads ticket & sends manual emails.<br/>
+            - <em>Layer 4 (Backstage Actions):</em> Manual Terraform HCL scripting & CLI syntax checks.<br/>
+            - <em>Layer 5 (Support Processes):</em> ITSM database lookup & spreadsheet budget checks.
+        `;
     } else if (type === 'qfd') {
         title.textContent = "Quality Function Deployment (QFD / House of Quality)";
-        if (isAgentic) {
-            desc.innerHTML = `
-                <strong>AI-Optimized House of Quality:</strong><br/>
-                - <em>Roof Correlations:</em> Strong positive synergy (➕) between automated script validation and deployment speed.<br/>
-                - <em>Matrix Relationships:</em> High alignment ($\odot$) between Customer WHATs (Fast provisioning, safety) and Engineering HOWs (AI Intent parsing, Cloudify validation).
-            `;
-        } else {
-            desc.innerHTML = `
-                <strong>Traditional House of Quality (Trade-off Friction):</strong><br/>
-                - <em>Roof Correlations:</em> Severe negative trade-offs (❌) between manual script checking and speed requirements.<br/>
-                - <em>Matrix Relationships:</em> Weak or conflicting relationships ($\Delta$, $\circ$) between Customer WHATs and manual engineering HOWs.
-            `;
-        }
+        desc.innerHTML = isAgentic ? `
+            <strong>AI-Optimized House of Quality:</strong><br/>
+            - <em>Roof Correlations:</em> Strong positive synergy (➕) between automated script validation and deployment speed.<br/>
+            - <em>Matrix Relationships:</em> High alignment (⊙) between Customer WHATs and Engineering HOWs.
+        ` : `
+            <strong>Traditional House of Quality (Trade-off Friction):</strong><br/>
+            - <em>Roof Correlations:</em> Severe negative trade-offs (❌) between manual script checking and speed requirements.<br/>
+            - <em>Matrix Relationships:</em> Weak or conflicting relationships (∆, ○) between Customer WHATs and manual engineering HOWs.
+        `;
+    } else if (type === 'dea') {
+        title.textContent = "Data Envelopment Analysis (DEA Efficiency Frontier)";
+        desc.innerHTML = isAgentic ? `
+            <strong>Data Envelopment Analysis (DEA) - Agentic EaaS:</strong><br/>
+            - <em>Efficiency Score:</em> <strong>θ = 1.00 (On Efficiency Frontier)</strong>.<br/>
+            - <em>Formulation:</em> $\\text{Max } \\theta = \\frac{\\sum u_r y_r}{\\sum v_i x_i}$. Units animate directly onto the convex Pareto-optimal frontier curve.
+        ` : `
+            <strong>Data Envelopment Analysis (DEA) - Traditional Baseline:</strong><br/>
+            - <em>Efficiency Score:</em> <strong>θ = 0.54 (Sub-optimal)</strong>.<br/>
+            - <em>Formulation:</em> $\\text{Max } \\theta = \\frac{\\sum u_r y_r}{\\sum v_i x_i}$. Units lie significantly below the efficiency boundary curve due to manual labor inputs.
+        `;
     } else {
         title.textContent = "Interactive Queue Dynamics Model";
-        if (isAgentic) {
-            desc.innerHTML = `
-                <strong>Parallel Execution Queue Model (M/M/∞ Equivalent):</strong><br/>
-                - Incoming requests bypass serialized lines and scale across parallel AI nodes directly to Cloudify API.<br/>
-                - <em>Key Metrics:</em> Queue length ($L_q \\approx 0$), Waiting time ($W_q \\approx 0$), instantaneous scaling.
-            `;
-        } else {
-            desc.innerHTML = `
-                <strong>Serialized Queuing Bottleneck (M/M/1 Model):</strong><br/>
-                - Incoming requests wait in a single line due to a single human engineer server bottleneck.<br/>
-                - <em>Key Metrics:</em> Growing line ($L_q$), severe wait times ($W_q$), customer balking/reneging.
-            `;
-        }
+        desc.innerHTML = isAgentic ? `
+            <strong>Parallel Execution Queue Model (M/M/∞ Equivalent):</strong><br/>
+            - <em>Key Metrics:</em> Queue length ($L_q = 0$), Waiting time ($W_q < 1.2\\text{ min}$), instantaneous scaling across API nodes.
+        ` : `
+            <strong>Serialized Queuing Bottleneck (M/M/1 Model):</strong><br/>
+            - <em>Key Metrics:</em> Growing backlog queue ($L_q = 45\\text{ req}$), severe wait times ($W_q = 18.5\\text{h}$), customer balking/reneging.
+        `;
     }
 
-    // Reset simulator structures
     traditionalQueue = [];
     traditionalServerBusy = false;
     traditionalTotalProcessed = 0;
@@ -478,8 +594,8 @@ function openVisOverlay(type, isAgentic) {
     agenticTotalProcessed = 0;
 
     blueprintT = 0;
+    deaPointProgress = 0;
 
-    // Start overlay rendering loop
     if (overlayAnimId) cancelAnimationFrame(overlayAnimId);
     renderOverlayFrame();
 }
@@ -503,6 +619,8 @@ function renderOverlayFrame() {
             drawBlueprintVisual(ctx, canvas.width, canvas.height);
         } else if (overlayVisType === 'qfd') {
             drawQFDVisual(ctx, canvas.width, canvas.height);
+        } else if (overlayVisType === 'dea') {
+            drawDEAVisual(ctx, canvas.width, canvas.height);
         } else {
             drawQueueVisual(ctx, canvas.width, canvas.height);
         }
@@ -512,7 +630,7 @@ function renderOverlayFrame() {
 }
 
 // ------------------------------------------
-// DRAW 5-SWIMLANE TEXTBOOK FIGURE 5.6 BLUEPRINT
+// DRAW 5-SWIMLANE FIGURE 5.6 BLUEPRINT
 // ------------------------------------------
 function drawBlueprintVisual(ctx, w, h) {
     const laneHeight = h / 5;
@@ -535,7 +653,6 @@ function drawBlueprintVisual(ctx, w, h) {
     ctx.lineWidth = 1;
     ctx.font = "bold 8px Outfit";
 
-    // Draw lines & labels
     for (let i = 1; i < 5; i++) {
         let y = i * laneHeight;
         ctx.beginPath();
@@ -544,19 +661,17 @@ function drawBlueprintVisual(ctx, w, h) {
         ctx.lineTo(w, y);
         ctx.stroke();
 
-        ctx.fillStyle = "rgba(100, 116, 139, 0.7)";
+        ctx.fillStyle = "rgba(148, 163, 184, 0.8)";
         ctx.fillText(boundaryLines[i-1], w - 125, y - 4);
     }
     ctx.setLineDash([]);
 
-    // Draw Lane headers
-    ctx.fillStyle = "#64748b";
+    ctx.fillStyle = "#94a3b8";
     lanes.forEach((name, idx) => {
         ctx.fillText(name.toUpperCase(), 12, idx * laneHeight + 16);
     });
 
     if (!overlayVisAgentic) {
-        // TRADITIONAL 5-SWIMLANE BLUEPRINT
         const boxes = [
             { x: 100, y: laneHeight * 0.5, txt: "Email Ticketing Portal", lane: 0 },
             { x: 230, y: laneHeight * 1.5, txt: "User Submits Ticket", lane: 1 },
@@ -565,8 +680,7 @@ function drawBlueprintVisual(ctx, w, h) {
             { x: 650, y: laneHeight * 4.5, txt: "ITSM DB & Spreadsheets", lane: 4 }
         ];
 
-        // Draw connections
-        ctx.strokeStyle = "rgba(244, 63, 94, 0.35)";
+        ctx.strokeStyle = "rgba(244, 63, 94, 0.4)";
         ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.moveTo(boxes[0].x, boxes[0].y);
@@ -575,14 +689,14 @@ function drawBlueprintVisual(ctx, w, h) {
 
         boxes.forEach((box, i) => {
             ctx.fillStyle = "rgba(15, 23, 42, 0.9)";
-            ctx.strokeStyle = "rgba(244, 63, 94, 0.5)";
+            ctx.strokeStyle = "rgba(244, 63, 94, 0.6)";
             ctx.lineWidth = 1.5;
             ctx.beginPath();
             ctx.roundRect(box.x - 65, box.y - 16, 130, 32, 6);
             ctx.fill();
             ctx.stroke();
 
-            ctx.fillStyle = "#f1f5f9";
+            ctx.fillStyle = "#f8fafc";
             ctx.font = "bold 8.5px Outfit";
             ctx.textAlign = "center";
             ctx.fillText(box.txt, box.x, box.y + 3);
@@ -606,7 +720,6 @@ function drawBlueprintVisual(ctx, w, h) {
             }
         });
 
-        // Slow particle
         blueprintT += 0.003;
         if (blueprintT > 1) blueprintT = 0;
         let pidx = Math.floor(blueprintT * 4);
@@ -626,7 +739,6 @@ function drawBlueprintVisual(ctx, w, h) {
         }
 
     } else {
-        // AI 5-SWIMLANE BLUEPRINT
         const boxes = [
             { x: 100, y: laneHeight * 0.5, txt: "Conversational AI UI", lane: 0 },
             { x: 230, y: laneHeight * 1.5, txt: "Types Natural Prompt", lane: 1 },
@@ -635,8 +747,7 @@ function drawBlueprintVisual(ctx, w, h) {
             { x: 650, y: laneHeight * 4.5, txt: "Cloudify API & RBAC Engine", lane: 4 }
         ];
 
-        // Draw connections
-        ctx.strokeStyle = "rgba(16, 185, 129, 0.4)";
+        ctx.strokeStyle = "rgba(16, 185, 129, 0.45)";
         ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.moveTo(boxes[0].x, boxes[0].y);
@@ -645,20 +756,19 @@ function drawBlueprintVisual(ctx, w, h) {
 
         boxes.forEach(box => {
             ctx.fillStyle = "rgba(15, 23, 42, 0.9)";
-            ctx.strokeStyle = "rgba(16, 185, 129, 0.5)";
+            ctx.strokeStyle = "rgba(16, 185, 129, 0.6)";
             ctx.lineWidth = 1.5;
             ctx.beginPath();
             ctx.roundRect(box.x - 65, box.y - 16, 130, 32, 6);
             ctx.fill();
             ctx.stroke();
 
-            ctx.fillStyle = "#f1f5f9";
+            ctx.fillStyle = "#f8fafc";
             ctx.font = "bold 8.5px Outfit";
             ctx.textAlign = "center";
             ctx.fillText(box.txt, box.x, box.y + 3);
             ctx.textAlign = "left";
 
-            // Green checkmark
             ctx.fillStyle = "#10b981";
             ctx.beginPath();
             ctx.arc(box.x + 60, box.y - 12, 5, 0, Math.PI * 2);
@@ -670,7 +780,6 @@ function drawBlueprintVisual(ctx, w, h) {
             ctx.textAlign = "left";
         });
 
-        // Fast particle
         blueprintT += 0.012;
         if (blueprintT > 1) blueprintT = 0;
         let pidx = Math.floor(blueprintT * 4);
@@ -719,12 +828,11 @@ function drawQFDVisual(ctx, w, h) {
         "Spreadsheet Auditing"
     ];
 
-    // 1. Draw Triangular Correlation Roof at the Top
     let roofTopX = startX + (cellW * 2);
     let roofTopY = 30;
     
     ctx.fillStyle = "rgba(15, 23, 42, 0.6)";
-    ctx.strokeStyle = overlayVisAgentic ? "rgba(16, 185, 129, 0.4)" : "rgba(244, 63, 94, 0.4)";
+    ctx.strokeStyle = overlayVisAgentic ? "rgba(16, 185, 129, 0.5)" : "rgba(244, 63, 94, 0.5)";
     ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.moveTo(startX, startY);
@@ -739,7 +847,6 @@ function drawQFDVisual(ctx, w, h) {
     ctx.textAlign = "center";
     ctx.fillText(overlayVisAgentic ? "CORRELATION ROOF: POSITIVE SYNERGY (+)" : "CORRELATION ROOF: HIGH CONFLICT (❌)", roofTopX, roofTopY + 45);
 
-    // 2. Draw Column Headers (HOWs)
     hows.forEach((how, j) => {
         let x = startX + (j * cellW);
         let y = startY;
@@ -751,17 +858,15 @@ function drawQFDVisual(ctx, w, h) {
         ctx.fill();
         ctx.stroke();
 
-        ctx.fillStyle = "#f1f5f9";
+        ctx.fillStyle = "#f8fafc";
         ctx.font = "bold 8.5px Outfit";
         ctx.textAlign = "center";
         ctx.fillText(how, x + cellW / 2, y + cellH / 2 + 3);
     });
 
-    // 3. Draw Row Headers (WHATs) and Matrix Body
     whats.forEach((what, i) => {
         let y = startY + cellH + (i * cellH);
 
-        // Row header
         ctx.fillStyle = "rgba(15, 23, 42, 0.9)";
         ctx.strokeStyle = "rgba(51, 65, 85, 0.6)";
         ctx.beginPath();
@@ -774,7 +879,6 @@ function drawQFDVisual(ctx, w, h) {
         ctx.textAlign = "left";
         ctx.fillText(what, 45, y + cellH / 2 + 3);
 
-        // Body Cells
         hows.forEach((how, j) => {
             let x = startX + (j * cellW);
 
@@ -785,16 +889,15 @@ function drawQFDVisual(ctx, w, h) {
             ctx.fill();
             ctx.stroke();
 
-            // Symbols logic
             let symbol = "○";
             let color = "#94a3b8";
 
             if (overlayVisAgentic) {
-                symbol = "⊙"; // Strong
+                symbol = "⊙";
                 color = "#10b981";
             } else {
                 if ((i === 0 && j === 0) || (i === 1 && j === 3)) {
-                    symbol = "∆"; // Weak / Friction
+                    symbol = "∆";
                     color = "#f43f5e";
                 }
             }
@@ -810,11 +913,87 @@ function drawQFDVisual(ctx, w, h) {
 }
 
 // ------------------------------------------
+// DRAW DATA ENVELOPMENT ANALYSIS (DEA) SCATTER & FRONTIER
+// ------------------------------------------
+function drawDEAVisual(ctx, w, h) {
+    let originX = 70;
+    let originY = h - 60;
+    let chartW = w - 120;
+    let chartH = h - 110;
+
+    // Draw Axes
+    ctx.strokeStyle = "rgba(148, 163, 184, 0.4)";
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(originX, 40);
+    ctx.lineTo(originX, originY);
+    ctx.lineTo(originX + chartW, originY);
+    ctx.stroke();
+
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "bold 9px Outfit";
+    ctx.fillText("OUTPUT: Service Throughput (Deployments / Hour)", originX + 10, 30);
+    ctx.fillText("INPUT: Operational Labor Cost & Cycle Time (x_i)", originX + chartW - 200, originY + 30);
+
+    // Convex Efficiency Frontier Curve (θ = 1.00)
+    ctx.strokeStyle = "#10b981";
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(originX + 40, originY - chartH * 0.9);
+    ctx.quadraticCurveTo(originX + chartW * 0.4, originY - chartH * 0.8, originX + chartW * 0.9, originY - chartH * 0.2);
+    ctx.stroke();
+
+    ctx.fillStyle = "#10b981";
+    ctx.font = "bold 9px Outfit";
+    ctx.fillText("CONVEX EFFICIENCY FRONTIER (θ = 1.00)", originX + chartW * 0.4, originY - chartH * 0.85);
+
+    // DMUs (Data Envelopment Units)
+    const dmus = [
+        { name: "DMU-1 (VM Staging)", baseInput: 0.75, baseOutput: 0.35, targetInput: 0.75, targetOutput: 0.75 },
+        { name: "DMU-2 (API Gateway)", baseInput: 0.55, baseOutput: 0.25, targetInput: 0.55, targetOutput: 0.82 },
+        { name: "DMU-3 (DB Cluster)", baseInput: 0.85, baseOutput: 0.42, targetInput: 0.85, targetOutput: 0.65 },
+        { name: "DMU-4 (Debug Env)", baseInput: 0.35, baseOutput: 0.18, targetInput: 0.35, targetOutput: 0.88 }
+    ];
+
+    if (overlayVisAgentic) {
+        deaPointProgress += 0.02;
+        if (deaPointProgress > 1) deaPointProgress = 1;
+    } else {
+        deaPointProgress = 0;
+    }
+
+    dmus.forEach(dmu => {
+        let curX = dmu.baseInput;
+        let curY = dmu.baseOutput + (dmu.targetOutput - dmu.baseOutput) * deaPointProgress;
+
+        let px = originX + (curX * chartW);
+        let py = originY - (curY * chartH);
+
+        let isOptimal = overlayVisAgentic && deaPointProgress >= 0.9;
+
+        ctx.fillStyle = isOptimal ? "#10b981" : "#f43f5e";
+        ctx.shadowColor = isOptimal ? "#10b981" : "#f43f5e";
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+        ctx.arc(px, py, 7, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        ctx.fillStyle = "#f8fafc";
+        ctx.font = "bold 8px Outfit";
+        ctx.fillText(`${dmu.name} (θ = ${(0.54 + (0.46 * deaPointProgress)).toFixed(2)})`, px + 10, py + 3);
+    });
+
+    ctx.fillStyle = overlayVisAgentic ? "#10b981" : "#f43f5e";
+    ctx.font = "bold 10px Outfit";
+    ctx.fillText(overlayVisAgentic ? "AGENTIC EAAS FRONTIER SCORE: θ = 1.00 (On Efficiency Boundary)" : "BASELINE FRONTIER SCORE: θ = 0.54 (Sub-Optimal Inefficiency)", originX + 20, originY - 15);
+}
+
+// ------------------------------------------
 // DRAW OVERLAY QUEUEING DYNAMICS
 // ------------------------------------------
 function drawQueueVisual(ctx, w, h) {
     if (!overlayVisAgentic) {
-        // TRADITIONAL M/M/1 MODEL
         if (Math.random() < 0.015 && traditionalQueue.length < 15) {
             traditionalQueue.push({
                 id: Math.random(),
@@ -847,7 +1026,6 @@ function drawQueueVisual(ctx, w, h) {
             }
         });
 
-        // Draw Server Node
         ctx.fillStyle = "rgba(15, 23, 42, 0.8)";
         ctx.strokeStyle = traditionalServerBusy ? "#eab308" : "#f43f5e";
         ctx.lineWidth = 2;
@@ -856,7 +1034,7 @@ function drawQueueVisual(ctx, w, h) {
         ctx.fill();
         ctx.stroke();
 
-        ctx.fillStyle = "#f1f5f9";
+        ctx.fillStyle = "#f8fafc";
         ctx.font = "bold 9px Outfit";
         ctx.textAlign = "center";
         ctx.fillText(traditionalServerBusy ? "BUSY (100%)" : "IDLE", 600, h / 2 + 3);
@@ -903,16 +1081,15 @@ function drawQueueVisual(ctx, w, h) {
         ctx.fillStyle = "#94a3b8";
         ctx.font = "bold 10px Outfit";
         ctx.textAlign = "left";
-        ctx.fillText(`QUEUE SIZE (Lq): ${traditionalQueue.length} requests`, 50, 50);
-        ctx.fillText(`WAITING TIME (Wq): High / Growing`, 50, 70);
+        ctx.fillText(`QUEUE SIZE (Lq): ${traditionalQueue.length} requests (45 Backlog)`, 50, 50);
+        ctx.fillText(`WAITING TIME (Wq): 18.5 Hours (Growing)`, 50, 70);
         ctx.fillText(`PROCESSED: ${traditionalTotalProcessed}`, 50, 90);
         ctx.fillText(`BALKED (Reneging): ${traditionalTotalBalked}`, 50, 110);
         
-        ctx.fillStyle = "rgba(244, 63, 94, 0.4)";
-        ctx.fillText("M/M/1 Ticketing Bottleneck", 50, 350);
+        ctx.fillStyle = "rgba(244, 63, 94, 0.6)";
+        ctx.fillText("M/M/1 Ticketing Bottleneck Queue [Wq = λ / μ(μ-λ)]", 50, 350);
 
     } else {
-        // AI ORCHESTRATION DYNAMIC CAPACITY (M/M/∞)
         if (Math.random() < 0.05 && agenticQueue.length < 10) {
             agenticQueue.push({
                 id: Math.random(),
@@ -950,14 +1127,14 @@ function drawQueueVisual(ctx, w, h) {
             }
 
             ctx.fillStyle = "rgba(15, 23, 42, 0.8)";
-            ctx.strokeStyle = server.busy ? "#10b981" : "rgba(16, 185, 129, 0.2)";
+            ctx.strokeStyle = server.busy ? "#10b981" : "rgba(16, 185, 129, 0.3)";
             ctx.lineWidth = 1.5;
             ctx.beginPath();
             ctx.arc(sx, sy, 22, 0, Math.PI * 2);
             ctx.fill();
             ctx.stroke();
 
-            ctx.fillStyle = "#f1f5f9";
+            ctx.fillStyle = "#f8fafc";
             ctx.font = "bold 8px Outfit";
             ctx.textAlign = "center";
             ctx.fillText(server.busy ? "ACTIVE" : "IDLE", sx, sy + 3);
@@ -989,25 +1166,25 @@ function drawQueueVisual(ctx, w, h) {
         ctx.fillStyle = "#94a3b8";
         ctx.font = "bold 10px Outfit";
         ctx.textAlign = "left";
-        ctx.fillText(`QUEUE SIZE (Lq): ${agenticQueue.length} (Near Zero)`, 50, 50);
-        ctx.fillText(`WAITING TIME (Wq): Instantaneous (Wq ≈ 0)`, 50, 70);
+        ctx.fillText(`QUEUE SIZE (Lq): 0 Requests (Instant)`, 50, 50);
+        ctx.fillText(`WAITING TIME (Wq): < 1.2 Minutes (Wq → 0)`, 50, 70);
         ctx.fillText(`PROCESSED: ${agenticTotalProcessed}`, 50, 90);
         ctx.fillText(`BALKED (Reneging): 0 (Zero)`, 50, 110);
         
-        ctx.fillStyle = "rgba(16, 185, 129, 0.4)";
-        ctx.fillText("M/M/c Parallel Autoscaling API Nodes", 50, 350);
+        ctx.fillStyle = "rgba(16, 185, 129, 0.6)";
+        ctx.fillText("M/M/c Parallel Autoscaling API Execution", 50, 350);
     }
 }
 
 // ==========================================
-// 6. PIPELINE SIMULATIONS (PAGE 1 & 2 CANVAS)
+// 6. PIPELINE SIMULATIONS & METRIC COUNTERS
 // ==========================================
 function startBaselineSimulation() {
     if (baselineSimActive) return;
     
     baselineSimActive = true;
     baselineProgress = 0;
-    baselineSlaTimer = 0;
+    baselineWqCounter = 18.5;
 
     resetNodeStatuses(false);
     updateNodeStatus("b1", "rose");
@@ -1015,8 +1192,10 @@ function startBaselineSimulation() {
     if (baselineTimerInterval) clearInterval(baselineTimerInterval);
     baselineTimerInterval = setInterval(() => {
         if (baselineSimActive) {
-            baselineSlaTimer += 0.1;
-            document.getElementById("txt-baseline-sla").textContent = `Time Elapsed: ${baselineSlaTimer.toFixed(1)} Hours`;
+            baselineWqCounter += 0.2;
+            let currentWq = baselineWqCounter.toFixed(1);
+            document.getElementById("txt-baseline-sla").textContent = `Wq Live Counter: ${currentWq} Hours`;
+            document.getElementById("metric-b-wq").textContent = `${currentWq} Hours`;
         }
     }, 150);
 }
@@ -1030,7 +1209,7 @@ function startAgenticSimulation() {
     
     let promptVal = document.getElementById("ipt-agent-prompt").value.trim();
     if (!promptVal) {
-        promptVal = "Deploy standard workspace VM";
+        promptVal = "Provision a downscaled staging VM for testing";
         document.getElementById("ipt-agent-prompt").value = promptVal;
     }
 
@@ -1042,7 +1221,12 @@ function startAgenticSimulation() {
 
     const consoleEl = document.getElementById("div-agent-console");
     consoleEl.innerHTML = "";
-    logMessage("INTENT PARSER", `Received request: "${promptVal}"`);
+    logMessage("INTENT PARSER", `Received prompt: "${promptVal}"`);
+    
+    // Live metric updates
+    document.getElementById("metric-a-wq").textContent = "< 0.8 Mins";
+    document.getElementById("metric-a-stp").textContent = "94%";
+    document.getElementById("metric-a-mttr").textContent = "45 Secs";
 }
 
 function logMessage(sub, msg) {
@@ -1056,7 +1240,7 @@ function resetNodeStatuses(isAgentic) {
     for(let i=1; i<=5; i++) {
         const dot = document.querySelector(`[data-node="${prefix}${i}"] .node-status-dot`);
         if(dot) {
-            dot.className = "node-status-dot absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-slate-600";
+            dot.className = "node-status-dot absolute top-2 right-2 w-2 h-2 rounded-full bg-slate-600";
         }
     }
 }
@@ -1065,11 +1249,11 @@ function updateNodeStatus(nodeId, colorClass) {
     const dot = document.querySelector(`[data-node="${nodeId}"] .node-status-dot`);
     if(dot) {
         if(colorClass === "rose") {
-            dot.className = "node-status-dot absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse";
+            dot.className = "node-status-dot absolute top-2 right-2 w-2 h-2 rounded-full bg-rose-500 animate-pulse";
         } else if(colorClass === "yellow") {
-            dot.className = "node-status-dot absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-yellow-pulsing";
+            dot.className = "node-status-dot absolute top-2 right-2 w-2 h-2 rounded-full bg-yellow-pulsing";
         } else if(colorClass === "emerald") {
-            dot.className = "node-status-dot absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse";
+            dot.className = "node-status-dot absolute top-2 right-2 w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
         }
     }
 }
@@ -1092,7 +1276,7 @@ function animationLoop() {
                 baselineSimActive = false;
                 clearInterval(baselineTimerInterval);
                 updateNodeStatus("b5", "rose");
-                alert(`Traditional provisioning completed! Total Time Elapsed: ${baselineSlaTimer.toFixed(1)} Hours.`);
+                alert(`Baseline provisioning finished with bottlenecks! Peak Wq Queue Time: ${baselineWqCounter.toFixed(1)} Hours.`);
             } else {
                 let startPos = getNodeCoordinates(segment, canvasB.width, canvasB.height);
                 let endPos = getNodeCoordinates(segment + 1, canvasB.width, canvasB.height);
@@ -1131,7 +1315,7 @@ function animationLoop() {
             if (segment >= 4) {
                 agenticSimActive = false;
                 updateNodeStatus("a5", "emerald");
-                logMessage("TELEMETRY", "Workspace environment is verified and active. Policy check: OK.");
+                logMessage("TELEMETRY", "Agentic EaaS execution verified. STP = 94%, MTTR < 90s, θ = 1.00.");
             } else {
                 let startPos = getNodeCoordinates(segment, canvasA.width, canvasA.height);
                 let endPos = getNodeCoordinates(segment + 1, canvasA.width, canvasA.height);
@@ -1141,13 +1325,13 @@ function animationLoop() {
 
                 if (segment === 1 && t < 0.1) {
                     updateNodeStatus("a2", "emerald");
-                    logMessage("AI AGENT", "Parsing requirements... selecting Cloudify Blueprint.");
+                    logMessage("AI AGENT", "Parsing intent parameters... selecting Cloudify Blueprint.");
                 } else if (segment === 2 && t < 0.1) {
                     updateNodeStatus("a3", "emerald");
-                    logMessage("POLICY", "Scanning budget boundaries and compliance guardrails... access ALLOWED.");
+                    logMessage("POLICY", "Checking budget limits and compliance guardrails... APPROVED.");
                 } else if (segment === 3 && t < 0.1) {
                     updateNodeStatus("a4", "emerald");
-                    logMessage("CLOUDIFY", "REST API call dispatched. Initiating Terraform state run.");
+                    logMessage("CLOUDIFY", "Dispatched REST payload to Terraform provider engine.");
                 }
 
                 ctx.fillStyle = "#10b981";
@@ -1171,30 +1355,110 @@ function getNodeCoordinates(nodeIndex, canvasW, canvasH) {
 }
 
 // ==========================================
-// 7. PAGE 3: COMPARISON MATRIX TABULATION
+// 7. PAGE 3: QUANTITATIVE MATRIX & BAR CHART
 // ==========================================
 function renderMatrixTable() {
     const tbody = document.getElementById("matrix-tbody");
     tbody.innerHTML = "";
 
-    somDatabase.forEach(item => {
-        if (matrixFilterCategory !== "all" && item.module !== matrixFilterCategory) {
+    somQuantitativeMetrics.forEach(item => {
+        if (matrixFilterCategory !== "all" && item.domain !== matrixFilterCategory) {
             return;
         }
 
         const tr = document.createElement("tr");
-        tr.className = "hover:bg-slate-900/30 transition-colors border-b border-slate-900";
+        tr.className = "hover:bg-slate-50 transition-colors border-b border-slate-200";
         tr.innerHTML = `
-            <td class="py-3 px-3 font-semibold font-outfit text-slate-200">
-                <span class="block text-[8px] uppercase tracking-wider text-slate-500 font-extrabold mb-0.5">${item.module}</span>
-                ${item.aspect}
+            <td class="py-3 px-3 font-semibold font-outfit text-slate-900">
+                <span class="block text-[8px] uppercase tracking-wider text-slate-500 font-extrabold mb-0.5">${item.domain}</span>
+                ${item.metric}
             </td>
-            <td class="py-3 px-3 text-slate-400 leading-normal pr-4">${item.traditional}</td>
-            <td class="py-3 px-3 text-slate-350 leading-normal pr-4">${item.orchestrated}</td>
-            <td class="py-3 px-3 text-cyan-400 font-semibold pr-3">${item.advantage}</td>
+            <td class="py-3 px-3 text-rose-700 font-bold leading-normal font-mono">${item.baseline}</td>
+            <td class="py-3 px-3 text-emerald-700 font-bold leading-normal font-mono">${item.agentic}</td>
+            <td class="py-3 px-3 text-indigo-800 font-mono text-[9.5px]">${item.formula}</td>
+            <td class="py-3 px-3 text-cyan-700 font-bold text-right font-mono">${item.gain}</td>
         `;
         tbody.appendChild(tr);
     });
+}
+
+function initBarChart() {
+    const ctx = document.getElementById("barChart").getContext("2d");
+    
+    barChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Wait Time (min)', 'Queue (req)', 'STP (%)', 'DPMO (/1k)', 'MTTR (min)', 'Waste (%)'],
+            datasets: [
+                {
+                    label: 'Baseline (Page 1)',
+                    data: [1110, 45, 28, 42, 140, 34],
+                    backgroundColor: 'rgba(244, 63, 94, 0.75)',
+                    borderColor: '#f43f5e',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Agentic EaaS (Page 2)',
+                    data: [1.2, 0, 94, 0.003, 1.5, 2],
+                    backgroundColor: 'rgba(16, 185, 129, 0.75)',
+                    borderColor: '#10b981',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: { color: '#334155', font: { family: 'Outfit', size: 10, weight: '600' } }
+                }
+            },
+            scales: {
+                x: { ticks: { color: '#64748b', font: { family: 'Outfit', size: 8.5 } }, grid: { color: '#e2e8f0' } },
+                y: { ticks: { color: '#64748b', font: { family: 'Outfit', size: 8.5 } }, grid: { color: '#e2e8f0' } }
+            }
+        }
+    });
+}
+
+function updateBarChart() {
+    if (!barChartInstance) return;
+
+    if (metricDisplayMode === 'raw') {
+        barChartInstance.data.labels = ['Wait Time (min)', 'Queue (req)', 'STP (%)', 'DPMO (/1k)', 'MTTR (min)', 'Waste (%)'];
+        barChartInstance.data.datasets = [
+            {
+                label: 'Baseline (Page 1)',
+                data: [1110, 45, 28, 42, 140, 34],
+                backgroundColor: 'rgba(244, 63, 94, 0.75)',
+                borderColor: '#f43f5e',
+                borderWidth: 1
+            },
+            {
+                label: 'Agentic EaaS (Page 2)',
+                data: [1.2, 0, 94, 0.003, 1.5, 2],
+                backgroundColor: 'rgba(16, 185, 129, 0.75)',
+                borderColor: '#10b981',
+                borderWidth: 1
+            }
+        ];
+    } else {
+        // Percentage Gains
+        barChartInstance.data.labels = ['Wait Time Red.', 'Queue Red.', 'DEA Gain', 'STP Gain', 'DPMO Drop', 'MTTR Speed', 'SERVQUAL', 'Waste Cut'];
+        barChartInstance.data.datasets = [
+            {
+                label: '% Performance Gain (Agentic EaaS)',
+                data: [98.9, 100.0, 85.2, 235.7, 99.9, 98.9, 134.9, 94.1],
+                backgroundColor: 'rgba(99, 102, 241, 0.8)',
+                borderColor: '#4338ca',
+                borderWidth: 1
+            }
+        ];
+    }
+
+    barChartInstance.update();
 }
 
 // ==========================================
@@ -1206,23 +1470,23 @@ function initRadarChart() {
     radarChartInstance = new Chart(ctx, {
         type: 'radar',
         data: {
-            labels: ['Blueprint Adaptability', 'Interactions Friction', 'Layout Transparency', 'Compliance checks', 'Process Control', 'Labor Productivity', 'SLA Adherence'],
+            labels: ['Wait Time (Wq)', 'Queue (Lq)', 'DEA (θ)', 'STP %', 'DPMO (6σ)', 'MTTR Speed', 'SERVQUAL (Q)', 'Yield Efficiency'],
             datasets: [
                 {
-                    label: 'Traditional Paradigm',
-                    data: [25, 80, 20, 15, 30, 15, 35],
+                    label: 'Baseline State (Page 1)',
+                    data: [15, 10, 54, 28, 20, 15, 25, 20],
                     borderColor: '#f43f5e',
-                    backgroundColor: 'rgba(244, 63, 94, 0.08)',
+                    backgroundColor: 'rgba(244, 63, 94, 0.12)',
                     borderWidth: 2,
-                    pointRadius: 2
+                    pointRadius: 3
                 },
                 {
-                    label: 'AI Agent + Cloudify',
-                    data: [95, 10, 95, 98, 92, 95, 98],
+                    label: 'Agentic EaaS State (Page 2)',
+                    data: [98, 100, 100, 94, 99, 98, 95, 96],
                     borderColor: '#10b981',
-                    backgroundColor: 'rgba(16, 185, 129, 0.08)',
+                    backgroundColor: 'rgba(16, 185, 129, 0.12)',
                     borderWidth: 2,
-                    pointRadius: 2
+                    pointRadius: 3
                 }
             ]
         },
@@ -1232,35 +1496,15 @@ function initRadarChart() {
             plugins: {
                 legend: {
                     position: 'top',
-                    labels: {
-                        color: '#94a3b8',
-                        font: {
-                            family: 'Outfit',
-                            size: 10,
-                            weight: '600'
-                        }
-                    }
+                    labels: { color: '#334155', font: { family: 'Outfit', size: 10, weight: '600' } }
                 }
             },
             scales: {
                 r: {
-                    angleLines: {
-                        color: 'rgba(51, 65, 85, 0.2)'
-                    },
-                    grid: {
-                        color: 'rgba(51, 65, 85, 0.2)'
-                    },
-                    pointLabels: {
-                        color: '#64748b',
-                        font: {
-                            family: 'Outfit',
-                            size: 9
-                        }
-                    },
-                    ticks: {
-                        display: false,
-                        maxTicksLimit: 5
-                    },
+                    angleLines: { color: 'rgba(203, 213, 225, 0.6)' },
+                    grid: { color: 'rgba(203, 213, 225, 0.6)' },
+                    pointLabels: { color: '#475569', font: { family: 'Outfit', size: 9 } },
+                    ticks: { display: false, maxTicksLimit: 5 },
                     suggestedMin: 0,
                     suggestedMax: 100
                 }
