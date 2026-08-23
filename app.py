@@ -20,10 +20,10 @@ st.markdown("""
             background-color: #f8fafc !important;
         }
         .block-container {
-            padding-top: 0rem !important;
-            padding-bottom: 0rem !important;
-            padding-left: 0rem !important;
-            padding-right: 0rem !important;
+            padding-top: 0.5rem !important;
+            padding-bottom: 0.5rem !important;
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
             max-width: 100% !important;
         }
         iframe {
@@ -36,9 +36,21 @@ st.markdown("""
 # Determine path directory
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
+csv_path = os.path.join(BASE_DIR, "som_benchmark_dataset_50_companies.csv")
 index_path = os.path.join(BASE_DIR, "index.html")
 styles_path = os.path.join(BASE_DIR, "styles.css")
 js_path = os.path.join(BASE_DIR, "app.js")
+
+# Top bar download option in Streamlit sidebar/toolbar
+if os.path.exists(csv_path):
+    with open(csv_path, "rb") as f:
+        st.download_button(
+            label="📥 Download Empirical Benchmark Dataset (50 Companies .CSV)",
+            data=f.read(),
+            file_name="som_benchmark_dataset_50_companies.csv",
+            mime="text/csv",
+            key="csv-download-btn"
+        )
 
 with open(index_path, "r", encoding="utf-8") as f:
     html_content = f.read()
@@ -59,4 +71,4 @@ html_bundled = html_content.replace(
 )
 
 # Render full height interactive application component
-components.html(html_bundled, height=1100, scrolling=True)
+components.html(html_bundled, height=1250, scrolling=True)

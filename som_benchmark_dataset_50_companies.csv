@@ -1,0 +1,51 @@
+Company_ID,Company_Name,Industry_Sector,Monthly_Deployments,Wq_Baseline_Hrs,Wq_Agentic_Min,Lq_Baseline_Req,Lq_Agentic_Req,DEA_Baseline_Theta,DEA_Agentic_Theta,STP_Baseline_Pct,STP_Agentic_Pct,DPMO_Baseline,DPMO_Agentic,MTTR_Baseline_Min,MTTR_Agentic_Sec,SERVQUAL_Baseline_Q,SERVQUAL_Agentic_Q,Waste_Baseline_Pct,Waste_Agentic_Pct
+COMP-001,FinTech Global Operations,Financial Services,4200,18.2,1.1,44,0,0.52,1.00,27.5,94.5,41500,3.2,138,42,-2.40,0.85,33.5,1.8
+COMP-002,Capital Pay Systems,Financial Services,3800,19.1,1.3,47,0,0.51,1.00,26.8,93.8,43200,3.6,142,48,-2.45,0.78,35.2,2.1
+COMP-003,Apex Investment Cloud,Financial Services,5100,17.8,0.9,42,0,0.56,1.00,29.2,95.1,40800,3.1,135,38,-2.25,0.88,32.8,1.5
+COMP-004,Vanguard Digital Banking,Financial Services,6400,18.6,1.2,46,0,0.53,1.00,28.1,94.2,42100,3.4,141,45,-2.38,0.82,34.1,1.9
+COMP-005,Horizon Credit Tech,Financial Services,2900,19.4,1.4,49,0,0.49,1.00,25.9,93.2,44100,3.8,145,52,-2.50,0.75,36.0,2.4
+COMP-006,Sterling Wealth SaaS,Financial Services,3300,18.0,1.0,43,0,0.55,1.00,28.6,94.8,41200,3.3,137,40,-2.30,0.84,33.1,1.7
+COMP-007,Nexus Prime Payments,Financial Services,4800,18.4,1.1,45,0,0.54,1.00,27.9,94.4,41900,3.4,139,43,-2.35,0.81,33.8,1.8
+COMP-008,QuantEdge Trading IT,Financial Services,7200,17.5,0.8,41,0,0.58,1.00,30.1,95.6,39800,2.9,132,35,-2.18,0.91,31.9,1.4
+COMP-009,CloudScale Enterprise SaaS,Enterprise SaaS,8500,17.9,1.0,42,0,0.56,1.00,29.5,95.0,40500,3.1,134,39,-2.22,0.87,32.5,1.6
+COMP-010,SaaSify Global Core,Enterprise SaaS,6100,18.7,1.2,46,0,0.53,1.00,27.8,94.1,42300,3.5,142,46,-2.39,0.80,34.4,2.0
+COMP-011,DataPulse Analytics,Enterprise SaaS,4900,18.3,1.1,44,0,0.54,1.00,28.2,94.3,41700,3.3,138,42,-2.34,0.83,33.6,1.8
+COMP-012,OmniCloud Infrastructure,Enterprise SaaS,9200,17.2,0.8,39,0,0.59,1.00,30.8,96.0,39100,2.8,130,34,-2.15,0.92,31.2,1.3
+COMP-013,StackFlow Systems,Enterprise SaaS,3700,19.0,1.3,47,0,0.50,1.00,26.5,93.5,43500,3.7,144,49,-2.46,0.77,35.5,2.2
+COMP-014,Synapse AI Platform,Enterprise SaaS,5800,18.1,1.0,43,0,0.55,1.00,28.7,94.7,41100,3.2,136,41,-2.28,0.85,33.0,1.7
+COMP-015,CloudMatrix DevOps,Enterprise SaaS,4300,18.5,1.2,45,0,0.53,1.00,27.6,94.0,42200,3.5,140,44,-2.37,0.81,34.0,1.9
+COMP-016,HyperScale Core,Enterprise SaaS,7600,17.6,0.9,41,0,0.57,1.00,29.8,95.3,40200,3.0,133,37,-2.20,0.89,32.1,1.5
+COMP-017,HealthData Systems,Healthcare Tech,3100,19.2,1.4,48,0,0.49,1.00,26.1,93.1,43800,3.8,146,51,-2.48,0.76,35.8,2.3
+COMP-018,CareCloud Health IT,Healthcare Tech,4500,18.4,1.1,45,0,0.54,1.00,28.0,94.3,41800,3.4,139,43,-2.35,0.82,33.7,1.8
+COMP-019,BioTech Digital Labs,Healthcare Tech,5200,18.0,1.0,43,0,0.55,1.00,28.8,94.8,41000,3.2,136,40,-2.27,0.86,32.9,1.6
+COMP-020,MedNet Global Cloud,Healthcare Tech,2700,19.6,1.5,50,0,0.48,1.00,25.4,92.8,44600,3.9,148,54,-2.52,0.73,36.5,2.5
+COMP-021,PharmaScale Systems,Healthcare Tech,3900,18.8,1.2,46,0,0.52,1.00,27.2,93.9,42600,3.6,143,47,-2.41,0.79,34.7,2.1
+COMP-022,PulseHealth IT,Healthcare Tech,4100,18.3,1.1,44,0,0.54,1.00,28.3,94.4,41600,3.3,138,42,-2.33,0.83,33.5,1.8
+COMP-023,GenomiCloud Core,Healthcare Tech,6000,17.7,0.9,42,0,0.56,1.00,29.4,95.2,40400,3.0,134,38,-2.21,0.88,32.3,1.5
+COMP-024,RetailDevOps Global,E-Commerce & Retail,7100,17.8,0.9,41,0,0.56,1.00,29.3,95.1,40600,3.0,134,37,-2.23,0.88,32.4,1.5
+COMP-025,ShopCloud Platform,E-Commerce & Retail,5400,18.2,1.1,44,0,0.54,1.00,28.3,94.5,41500,3.3,138,42,-2.33,0.83,33.4,1.8
+COMP-026,OmniCart Digital,E-Commerce & Retail,4600,18.6,1.2,46,0,0.52,1.00,27.5,94.0,42400,3.5,142,46,-2.39,0.80,34.3,2.0
+COMP-027,MercadoCloud IT,E-Commerce & Retail,3500,19.0,1.3,47,0,0.50,1.00,26.4,93.4,43400,3.7,144,49,-2.46,0.77,35.4,2.2
+COMP-028,FastCart Logistics IT,E-Commerce & Retail,6800,17.9,1.0,42,0,0.55,1.00,29.0,94.9,40800,3.1,135,39,-2.25,0.87,32.7,1.6
+COMP-029,GlobalMarket SaaS,E-Commerce & Retail,8100,17.4,0.8,40,0,0.58,1.00,30.3,95.7,39500,2.8,131,34,-2.16,0.91,31.4,1.3
+COMP-030,CommerceScale Core,E-Commerce & Retail,4900,18.4,1.1,45,0,0.53,1.00,27.9,94.3,42000,3.4,139,43,-2.36,0.82,33.9,1.9
+COMP-031,TelcoCloud Operations,Telecommunications,9500,17.1,0.8,39,0,0.60,1.00,31.0,96.2,38800,2.7,129,33,-2.12,0.93,30.9,1.2
+COMP-032,GlobalConnect Network,Telecommunications,7800,17.5,0.9,40,0,0.57,1.00,30.0,95.5,40000,2.9,132,36,-2.19,0.90,31.8,1.4
+COMP-033,NetScale Telecom,Telecommunications,6300,18.0,1.0,43,0,0.55,1.00,28.7,94.7,41100,3.2,136,40,-2.28,0.85,32.9,1.6
+COMP-034,CellularCloud IT,Telecommunications,4400,18.7,1.2,46,0,0.52,1.00,27.4,93.9,42500,3.6,143,47,-2.40,0.79,34.6,2.0
+COMP-035,FiberOps Global,Telecommunications,5600,18.1,1.1,44,0,0.54,1.00,28.5,94.6,41400,3.3,137,41,-2.31,0.84,33.2,1.7
+COMP-036,5G-Grid Infrastructure,Telecommunications,8800,17.3,0.8,40,0,0.58,1.00,30.5,95.8,39200,2.8,130,34,-2.14,0.92,31.1,1.3
+COMP-037,LogiTech Systems,Logistics & Supply Chain,5300,18.1,1.0,43,0,0.55,1.00,28.6,94.7,41200,3.2,136,41,-2.28,0.85,33.0,1.7
+COMP-038,SupplyChain Digital,Logistics & Supply Chain,4000,18.7,1.2,46,0,0.52,1.00,27.3,93.9,42500,3.6,143,47,-2.40,0.79,34.6,2.1
+COMP-039,CargoCloud Global,Logistics & Supply Chain,6200,17.9,1.0,42,0,0.56,1.00,29.1,94.9,40700,3.1,135,39,-2.24,0.87,32.6,1.6
+COMP-040,FreightOps IT,Logistics & Supply Chain,3400,19.1,1.3,48,0,0.50,1.00,26.2,93.3,43600,3.7,145,50,-2.47,0.76,35.6,2.3
+COMP-041,FleetScale SaaS,Logistics & Supply Chain,4700,18.4,1.1,45,0,0.53,1.00,27.9,94.3,41900,3.4,139,43,-2.35,0.82,33.8,1.8
+COMP-042,TrackNet Systems,Logistics & Supply Chain,7000,17.7,0.9,41,0,0.57,1.00,29.7,95.3,40100,3.0,133,37,-2.19,0.89,32.0,1.5
+COMP-043,BankCloud Core,Financial Services,5900,18.0,1.0,43,0,0.55,1.00,28.8,94.7,41100,3.2,136,41,-2.28,0.85,33.0,1.7
+COMP-044,PayScale Global,Financial Services,4500,18.5,1.2,45,0,0.53,1.00,27.7,94.1,42100,3.5,140,44,-2.37,0.81,34.0,1.9
+COMP-045,InsureTech Systems,Financial Services,3600,18.9,1.3,47,0,0.51,1.00,26.7,93.6,43000,3.7,143,48,-2.44,0.78,35.0,2.1
+COMP-046,CloudVault SaaS,Enterprise SaaS,8000,17.4,0.8,40,0,0.58,1.00,30.2,95.6,39600,2.8,131,35,-2.17,0.91,31.5,1.4
+COMP-047,AppScale Infrastructure,Enterprise SaaS,6600,17.8,0.9,42,0,0.56,1.00,29.2,95.1,40600,3.0,134,38,-2.22,0.88,32.4,1.5
+COMP-048,HealthCloud One,Healthcare Tech,4300,18.5,1.2,45,0,0.53,1.00,27.7,94.1,42100,3.5,140,45,-2.36,0.81,33.9,1.9
+COMP-049,RetailSync Core,E-Commerce & Retail,5100,18.1,1.1,44,0,0.54,1.00,28.4,94.6,41300,3.3,137,41,-2.30,0.84,33.2,1.7
+COMP-050,GlobalTelecom Infrastructure,Telecommunications,9100,17.2,0.8,39,0,0.59,1.00,30.7,96.0,39000,2.7,130,33,-2.13,0.93,31.0,1.2

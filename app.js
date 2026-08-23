@@ -1,17 +1,70 @@
 // Services Operations Management Simulator & Orchestration Engine
 
 // ==========================================
-// 1. DATA DATABASE: 24 QUALITATIVE & 8 QUANTITATIVE METRICS
+// 1. EMPIRICAL 50-COMPANY BENCHMARK DATASET
 // ==========================================
+const companies50Dataset = [
+    { id: "COMP-001", name: "FinTech Global Operations", sector: "Financial Services", reqs: 4200, wqBase: 18.2, wqAgent: 1.1, lqBase: 44, lqAgent: 0, deaBase: 0.52, deaAgent: 1.00, stpBase: 27.5, stpAgent: 94.5, dpmoBase: 41500, dpmoAgent: 3.2, mttrBase: 138, mttrAgent: 42, qBase: -2.40, qAgent: 0.85, wasteBase: 33.5, wasteAgent: 1.8 },
+    { id: "COMP-002", name: "Capital Pay Systems", sector: "Financial Services", reqs: 3800, wqBase: 19.1, wqAgent: 1.3, lqBase: 47, lqAgent: 0, deaBase: 0.51, deaAgent: 1.00, stpBase: 26.8, stpAgent: 93.8, dpmoBase: 43200, dpmoAgent: 3.6, mttrBase: 142, mttrAgent: 48, qBase: -2.45, qAgent: 0.78, wasteBase: 35.2, wasteAgent: 2.1 },
+    { id: "COMP-003", name: "Apex Investment Cloud", sector: "Financial Services", reqs: 5100, wqBase: 17.8, wqAgent: 0.9, lqBase: 42, lqAgent: 0, deaBase: 0.56, deaAgent: 1.00, stpBase: 29.2, stpAgent: 95.1, dpmoBase: 40800, dpmoAgent: 3.1, mttrBase: 135, mttrAgent: 38, qBase: -2.25, qAgent: 0.88, wasteBase: 32.8, wasteAgent: 1.5 },
+    { id: "COMP-004", name: "Vanguard Digital Banking", sector: "Financial Services", reqs: 6400, wqBase: 18.6, wqAgent: 1.2, lqBase: 46, lqAgent: 0, deaBase: 0.53, deaAgent: 1.00, stpBase: 28.1, stpAgent: 94.2, dpmoBase: 42100, dpmoAgent: 3.4, mttrBase: 141, mttrAgent: 45, qBase: -2.38, qAgent: 0.82, wasteBase: 34.1, wasteAgent: 1.9 },
+    { id: "COMP-005", name: "Horizon Credit Tech", sector: "Financial Services", reqs: 2900, wqBase: 19.4, wqAgent: 1.4, lqBase: 49, lqAgent: 0, deaBase: 0.49, deaAgent: 1.00, stpBase: 25.9, stpAgent: 93.2, dpmoBase: 44100, dpmoAgent: 3.8, mttrBase: 145, mttrAgent: 52, qBase: -2.50, qAgent: 0.75, wasteBase: 36.0, wasteAgent: 2.4 },
+    { id: "COMP-006", name: "Sterling Wealth SaaS", sector: "Financial Services", reqs: 3300, wqBase: 18.0, wqAgent: 1.0, lqBase: 43, lqAgent: 0, deaBase: 0.55, deaAgent: 1.00, stpBase: 28.6, stpAgent: 94.8, dpmoBase: 41200, dpmoAgent: 3.3, mttrBase: 137, mttrAgent: 40, qBase: -2.30, qAgent: 0.84, wasteBase: 33.1, wasteAgent: 1.7 },
+    { id: "COMP-007", name: "Nexus Prime Payments", sector: "Financial Services", reqs: 4800, wqBase: 18.4, wqAgent: 1.1, lqBase: 45, lqAgent: 0, deaBase: 0.54, deaAgent: 1.00, stpBase: 27.9, stpAgent: 94.4, dpmoBase: 41900, dpmoAgent: 3.4, mttrBase: 139, mttrAgent: 43, qBase: -2.35, qAgent: 0.81, wasteBase: 33.8, wasteAgent: 1.8 },
+    { id: "COMP-008", name: "QuantEdge Trading IT", sector: "Financial Services", reqs: 7200, wqBase: 17.5, wqAgent: 0.8, lqBase: 41, lqAgent: 0, deaBase: 0.58, deaAgent: 1.00, stpBase: 30.1, stpAgent: 95.6, dpmoBase: 39800, dpmoAgent: 2.9, mttrBase: 132, mttrAgent: 35, qBase: -2.18, qAgent: 0.91, wasteBase: 31.9, wasteAgent: 1.4 },
+    { id: "COMP-009", name: "CloudScale Enterprise SaaS", sector: "Enterprise SaaS", reqs: 8500, wqBase: 17.9, wqAgent: 1.0, lqBase: 42, lqAgent: 0, deaBase: 0.56, deaAgent: 1.00, stpBase: 29.5, stpAgent: 95.0, dpmoBase: 40500, dpmoAgent: 3.1, mttrBase: 134, mttrAgent: 39, qBase: -2.22, qAgent: 0.87, wasteBase: 32.5, wasteAgent: 1.6 },
+    { id: "COMP-010", name: "SaaSify Global Core", sector: "Enterprise SaaS", reqs: 6100, wqBase: 18.7, wqAgent: 1.2, lqBase: 46, lqAgent: 0, deaBase: 0.53, deaAgent: 1.00, stpBase: 27.8, stpAgent: 94.1, dpmoBase: 42300, dpmoAgent: 3.5, mttrBase: 142, mttrAgent: 46, qBase: -2.39, qAgent: 0.80, wasteBase: 34.4, wasteAgent: 2.0 },
+    { id: "COMP-011", name: "DataPulse Analytics", sector: "Enterprise SaaS", reqs: 4900, wqBase: 18.3, wqAgent: 1.1, lqBase: 44, lqAgent: 0, deaBase: 0.54, deaAgent: 1.00, stpBase: 28.2, stpAgent: 94.3, dpmoBase: 41700, dpmoAgent: 3.3, mttrBase: 138, mttrAgent: 42, qBase: -2.34, qAgent: 0.83, wasteBase: 33.6, wasteAgent: 1.8 },
+    { id: "COMP-012", name: "OmniCloud Infrastructure", sector: "Enterprise SaaS", reqs: 9200, wqBase: 17.2, wqAgent: 0.8, lqBase: 39, lqAgent: 0, deaBase: 0.59, deaAgent: 1.00, stpBase: 30.8, stpAgent: 96.0, dpmoBase: 39100, dpmoAgent: 2.8, mttrBase: 130, mttrAgent: 34, qBase: -2.15, qAgent: 0.92, wasteBase: 31.2, wasteAgent: 1.3 },
+    { id: "COMP-013", name: "StackFlow Systems", sector: "Enterprise SaaS", reqs: 3700, wqBase: 19.0, wqAgent: 1.3, lqBase: 47, lqAgent: 0, deaBase: 0.50, deaAgent: 1.00, stpBase: 26.5, stpAgent: 93.5, dpmoBase: 43500, dpmoAgent: 3.7, mttrBase: 144, mttrAgent: 49, qBase: -2.46, qAgent: 0.77, wasteBase: 35.5, wasteAgent: 2.2 },
+    { id: "COMP-014", name: "Synapse AI Platform", sector: "Enterprise SaaS", reqs: 5800, wqBase: 18.1, wqAgent: 1.0, lqBase: 43, lqAgent: 0, deaBase: 0.55, deaAgent: 1.00, stpBase: 28.7, stpAgent: 94.7, dpmoBase: 41100, dpmoAgent: 3.2, mttrBase: 136, mttrAgent: 41, qBase: -2.28, qAgent: 0.85, wasteBase: 33.0, wasteAgent: 1.7 },
+    { id: "COMP-015", name: "CloudMatrix DevOps", sector: "Enterprise SaaS", reqs: 4300, wqBase: 18.5, wqAgent: 1.2, lqBase: 45, lqAgent: 0, deaBase: 0.53, deaAgent: 1.00, stpBase: 27.6, stpAgent: 94.0, dpmoBase: 42200, dpmoAgent: 3.5, mttrBase: 140, mttrAgent: 44, qBase: -2.37, qAgent: 0.81, wasteBase: 34.0, wasteAgent: 1.9 },
+    { id: "COMP-016", name: "HyperScale Core", sector: "Enterprise SaaS", reqs: 7600, wqBase: 17.6, wqAgent: 0.9, lqBase: 41, lqAgent: 0, deaBase: 0.57, deaAgent: 1.00, stpBase: 29.8, stpAgent: 95.3, dpmoBase: 40200, dpmoAgent: 3.0, mttrBase: 133, mttrAgent: 37, qBase: -2.20, qAgent: 0.89, wasteBase: 32.1, wasteAgent: 1.5 },
+    { id: "COMP-017", name: "HealthData Systems", sector: "Healthcare Tech", reqs: 3100, wqBase: 19.2, wqAgent: 1.4, lqBase: 48, lqAgent: 0, deaBase: 0.49, deaAgent: 1.00, stpBase: 26.1, stpAgent: 93.1, dpmoBase: 43800, dpmoAgent: 3.8, mttrBase: 146, mttrAgent: 51, qBase: -2.48, qAgent: 0.76, wasteBase: 35.8, wasteAgent: 2.3 },
+    { id: "COMP-018", name: "CareCloud Health IT", sector: "Healthcare Tech", reqs: 4500, wqBase: 18.4, wqAgent: 1.1, lqBase: 45, lqAgent: 0, deaBase: 0.54, deaAgent: 1.00, stpBase: 28.0, stpAgent: 94.3, dpmoBase: 41800, dpmoAgent: 3.4, mttrBase: 139, mttrAgent: 43, qBase: -2.35, qAgent: 0.82, wasteBase: 33.7, wasteAgent: 1.8 },
+    { id: "COMP-019", name: "BioTech Digital Labs", sector: "Healthcare Tech", reqs: 5200, wqBase: 18.0, wqAgent: 1.0, lqBase: 43, lqAgent: 0, deaBase: 0.55, deaAgent: 1.00, stpBase: 28.8, stpAgent: 94.8, dpmoBase: 41000, dpmoAgent: 3.2, mttrBase: 136, mttrAgent: 40, qBase: -2.27, qAgent: 0.86, wasteBase: 32.9, wasteAgent: 1.6 },
+    { id: "COMP-020", name: "MedNet Global Cloud", sector: "Healthcare Tech", reqs: 2700, wqBase: 19.6, wqAgent: 1.5, lqBase: 50, lqAgent: 0, deaBase: 0.48, deaAgent: 1.00, stpBase: 25.4, stpAgent: 92.8, dpmoBase: 44600, dpmoAgent: 3.9, mttrBase: 148, mttrAgent: 54, qBase: -2.52, qAgent: 0.73, wasteBase: 36.5, wasteAgent: 2.5 },
+    { id: "COMP-021", name: "PharmaScale Systems", sector: "Healthcare Tech", reqs: 3900, wqBase: 18.8, wqAgent: 1.2, lqBase: 46, lqAgent: 0, deaBase: 0.52, deaAgent: 1.00, stpBase: 27.2, stpAgent: 93.9, dpmoBase: 42600, dpmoAgent: 3.6, mttrBase: 143, mttrAgent: 47, qBase: -2.41, qAgent: 0.79, wasteBase: 34.7, wasteAgent: 2.1 },
+    { id: "COMP-022", name: "PulseHealth IT", sector: "Healthcare Tech", reqs: 4100, wqBase: 18.3, wqAgent: 1.1, lqBase: 44, lqAgent: 0, deaBase: 0.54, deaAgent: 1.00, stpBase: 28.3, stpAgent: 94.4, dpmoBase: 41600, dpmoAgent: 3.3, mttrBase: 138, mttrAgent: 42, qBase: -2.33, qAgent: 0.83, wasteBase: 33.5, wasteAgent: 1.8 },
+    { id: "COMP-023", name: "GenomiCloud Core", sector: "Healthcare Tech", reqs: 6000, wqBase: 17.7, wqAgent: 0.9, lqBase: 42, lqAgent: 0, deaBase: 0.56, deaAgent: 1.00, stpBase: 29.4, stpAgent: 95.2, dpmoBase: 40400, dpmoAgent: 3.0, mttrBase: 134, mttrAgent: 38, qBase: -2.21, qAgent: 0.88, wasteBase: 32.3, wasteAgent: 1.5 },
+    { id: "COMP-024", name: "RetailDevOps Global", sector: "E-Commerce & Retail", reqs: 7100, wqBase: 17.8, wqAgent: 0.9, lqBase: 41, lqAgent: 0, deaBase: 0.56, deaAgent: 1.00, stpBase: 29.3, stpAgent: 95.1, dpmoBase: 40600, dpmoAgent: 3.0, mttrBase: 134, mttrAgent: 37, qBase: -2.23, qAgent: 0.88, wasteBase: 32.4, wasteAgent: 1.5 },
+    { id: "COMP-025", name: "ShopCloud Platform", sector: "E-Commerce & Retail", reqs: 5400, wqBase: 18.2, wqAgent: 1.1, lqBase: 44, lqAgent: 0, deaBase: 0.54, deaAgent: 1.00, stpBase: 28.3, stpAgent: 94.5, dpmoBase: 41500, dpmoAgent: 3.3, mttrBase: 138, mttrAgent: 42, qBase: -2.33, qAgent: 0.83, wasteBase: 33.4, wasteAgent: 1.8 },
+    { id: "COMP-026", name: "OmniCart Digital", sector: "E-Commerce & Retail", reqs: 4600, wqBase: 18.6, wqAgent: 1.2, lqBase: 46, lqAgent: 0, deaBase: 0.52, deaAgent: 1.00, stpBase: 27.5, stpAgent: 94.0, dpmoBase: 42400, dpmoAgent: 3.5, mttrBase: 142, mttrAgent: 46, qBase: -2.39, qAgent: 0.80, wasteBase: 34.3, wasteAgent: 2.0 },
+    { id: "COMP-027", name: "MercadoCloud IT", sector: "E-Commerce & Retail", reqs: 3500, wqBase: 19.0, wqAgent: 1.3, lqBase: 47, lqAgent: 0, deaBase: 0.50, deaAgent: 1.00, stpBase: 26.4, stpAgent: 93.4, dpmoBase: 43400, dpmoAgent: 3.7, mttrBase: 144, mttrAgent: 49, qBase: -2.46, qAgent: 0.77, wasteBase: 35.4, wasteAgent: 2.2 },
+    { id: "COMP-028", name: "FastCart Logistics IT", sector: "E-Commerce & Retail", reqs: 6800, wqBase: 17.9, wqAgent: 1.0, lqBase: 42, lqAgent: 0, deaBase: 0.55, deaAgent: 1.00, stpBase: 29.0, stpAgent: 94.9, dpmoBase: 40800, dpmoAgent: 3.1, mttrBase: 135, mttrAgent: 39, qBase: -2.25, qAgent: 0.87, wasteBase: 32.7, wasteAgent: 1.6 },
+    { id: "COMP-029", name: "GlobalMarket SaaS", sector: "E-Commerce & Retail", reqs: 8100, wqBase: 17.4, wqAgent: 0.8, lqBase: 40, lqAgent: 0, deaBase: 0.58, deaAgent: 1.00, stpBase: 30.3, stpAgent: 95.7, dpmoBase: 39500, dpmoAgent: 2.8, mttrBase: 131, mttrAgent: 34, qBase: -2.16, qAgent: 0.91, wasteBase: 31.4, wasteAgent: 1.3 },
+    { id: "COMP-030", name: "CommerceScale Core", sector: "E-Commerce & Retail", reqs: 4900, wqBase: 18.4, wqAgent: 1.1, lqBase: 45, lqAgent: 0, deaBase: 0.53, deaAgent: 1.00, stpBase: 27.9, stpAgent: 94.3, dpmoBase: 42000, dpmoAgent: 3.4, mttrBase: 139, mttrAgent: 43, qBase: -2.36, qAgent: 0.82, wasteBase: 33.9, wasteAgent: 1.9 },
+    { id: "COMP-031", name: "TelcoCloud Operations", sector: "Telecommunications", reqs: 9500, wqBase: 17.1, wqAgent: 0.8, lqBase: 39, lqAgent: 0, deaBase: 0.60, deaAgent: 1.00, stpBase: 31.0, stpAgent: 96.2, dpmoBase: 38800, dpmoAgent: 2.7, mttrBase: 129, mttrAgent: 33, qBase: -2.12, qAgent: 0.93, wasteBase: 30.9, wasteAgent: 1.2 },
+    { id: "COMP-032", name: "GlobalConnect Network", sector: "Telecommunications", reqs: 7800, wqBase: 17.5, wqAgent: 0.9, lqBase: 40, lqAgent: 0, deaBase: 0.57, deaAgent: 1.00, stpBase: 30.0, stpAgent: 95.5, dpmoBase: 40000, dpmoAgent: 2.9, mttrBase: 132, mttrAgent: 36, qBase: -2.19, qAgent: 0.90, wasteBase: 31.8, wasteAgent: 1.4 },
+    { id: "COMP-033", name: "NetScale Telecom", sector: "Telecommunications", reqs: 6300, wqBase: 18.0, wqAgent: 1.0, lqBase: 43, lqAgent: 0, deaBase: 0.55, deaAgent: 1.00, stpBase: 28.7, stpAgent: 94.7, dpmoBase: 41100, dpmoAgent: 3.2, mttrBase: 136, mttrAgent: 40, qBase: -2.28, qAgent: 0.85, wasteBase: 32.9, wasteAgent: 1.6 },
+    { id: "COMP-034", name: "CellularCloud IT", sector: "Telecommunications", reqs: 4400, wqBase: 18.7, wqAgent: 1.2, lqBase: 46, lqAgent: 0, deaBase: 0.52, deaAgent: 1.00, stpBase: 27.4, stpAgent: 93.9, dpmoBase: 42500, dpmoAgent: 3.6, mttrBase: 143, mttrAgent: 47, qBase: -2.40, qAgent: 0.79, wasteBase: 34.6, wasteAgent: 2.0 },
+    { id: "COMP-035", name: "FiberOps Global", sector: "Telecommunications", reqs: 5600, wqBase: 18.1, wqAgent: 1.1, lqBase: 44, lqAgent: 0, deaBase: 0.54, deaAgent: 1.00, stpBase: 28.5, stpAgent: 94.6, dpmoBase: 41400, dpmoAgent: 3.3, mttrBase: 137, mttrAgent: 41, qBase: -2.31, qAgent: 0.84, wasteBase: 33.2, wasteAgent: 1.7 },
+    { id: "COMP-036", name: "5G-Grid Infrastructure", sector: "Telecommunications", reqs: 8800, wqBase: 17.3, wqAgent: 0.8, lqBase: 40, lqAgent: 0, deaBase: 0.58, deaAgent: 1.00, stpBase: 30.5, stpAgent: 95.8, dpmoBase: 39200, dpmoAgent: 2.8, mttrBase: 130, mttrAgent: 34, qBase: -2.14, qAgent: 0.92, wasteBase: 31.1, wasteAgent: 1.3 },
+    { id: "COMP-037", name: "LogiTech Systems", sector: "Logistics & Supply Chain", reqs: 5300, wqBase: 18.1, wqAgent: 1.0, lqBase: 43, lqAgent: 0, deaBase: 0.55, deaAgent: 1.00, stpBase: 28.6, stpAgent: 94.7, dpmoBase: 41200, dpmoAgent: 3.2, mttrBase: 136, mttrAgent: 41, qBase: -2.28, qAgent: 0.85, wasteBase: 33.0, wasteAgent: 1.7 },
+    { id: "COMP-038", name: "SupplyChain Digital", sector: "Logistics & Supply Chain", reqs: 4000, wqBase: 18.7, wqAgent: 1.2, lqBase: 46, lqAgent: 0, deaBase: 0.52, deaAgent: 1.00, stpBase: 27.3, stpAgent: 93.9, dpmoBase: 42500, dpmoAgent: 3.6, mttrBase: 143, mttrAgent: 47, qBase: -2.40, qAgent: 0.79, wasteBase: 34.6, wasteAgent: 2.1 },
+    { id: "COMP-039", name: "CargoCloud Global", sector: "Logistics & Supply Chain", reqs: 6200, wqBase: 17.9, wqAgent: 1.0, lqBase: 42, lqAgent: 0, deaBase: 0.56, deaAgent: 1.00, stpBase: 29.1, stpAgent: 94.9, dpmoBase: 40700, dpmoAgent: 3.1, mttrBase: 135, mttrAgent: 39, qBase: -2.24, qAgent: 0.87, wasteBase: 32.6, wasteAgent: 1.6 },
+    { id: "COMP-040", name: "FreightOps IT", sector: "Logistics & Supply Chain", reqs: 3400, wqBase: 19.1, wqAgent: 1.3, lqBase: 48, lqAgent: 0, deaBase: 0.50, deaAgent: 1.00, stpBase: 26.2, stpAgent: 93.3, dpmoBase: 43600, dpmoAgent: 3.7, mttrBase: 145, mttrAgent: 50, qBase: -2.47, qAgent: 0.76, wasteBase: 35.6, wasteAgent: 2.3 },
+    { id: "COMP-041", name: "FleetScale SaaS", sector: "Logistics & Supply Chain", reqs: 4700, wqBase: 18.4, wqAgent: 1.1, lqBase: 45, lqAgent: 0, deaBase: 0.53, deaAgent: 1.00, stpBase: 27.9, stpAgent: 94.3, dpmoBase: 41900, dpmoAgent: 3.4, mttrBase: 139, mttrAgent: 43, qBase: -2.35, qAgent: 0.82, wasteBase: 33.8, wasteAgent: 1.8 },
+    { id: "COMP-042", name: "TrackNet Systems", sector: "Logistics & Supply Chain", reqs: 7000, wqBase: 17.7, wqAgent: 0.9, lqBase: 41, lqAgent: 0, deaBase: 0.57, deaAgent: 1.00, stpBase: 29.7, stpAgent: 95.3, dpmoBase: 40100, dpmoAgent: 3.0, mttrBase: 133, mttrAgent: 37, qBase: -2.19, qAgent: 0.89, wasteBase: 32.0, wasteAgent: 1.5 },
+    { id: "COMP-043", name: "BankCloud Core", sector: "Financial Services", reqs: 5900, wqBase: 18.0, wqAgent: 1.0, lqBase: 43, lqAgent: 0, deaBase: 0.55, deaAgent: 1.00, stpBase: 28.8, stpAgent: 94.7, dpmoBase: 41100, dpmoAgent: 3.2, mttrBase: 136, mttrAgent: 41, qBase: -2.28, qAgent: 0.85, wasteBase: 33.0, wasteAgent: 1.7 },
+    { id: "COMP-044", name: "PayScale Global", sector: "Financial Services", reqs: 4500, wqBase: 18.5, wqAgent: 1.2, lqBase: 45, lqAgent: 0, deaBase: 0.53, deaAgent: 1.00, stpBase: 27.7, stpAgent: 94.1, dpmoBase: 42100, dpmoAgent: 3.5, mttrBase: 140, mttrAgent: 44, qBase: -2.37, qAgent: 0.81, wasteBase: 34.0, wasteAgent: 1.9 },
+    { id: "COMP-045", name: "InsureTech Systems", sector: "Financial Services", reqs: 3600, wqBase: 18.9, wqAgent: 1.3, lqBase: 47, lqAgent: 0, deaBase: 0.51, deaAgent: 1.00, stpBase: 26.7, stpAgent: 93.6, dpmoBase: 43000, dpmoAgent: 3.7, mttrBase: 143, mttrAgent: 48, qBase: -2.44, qAgent: 0.78, wasteBase: 35.0, wasteAgent: 2.1 },
+    { id: "COMP-046", name: "CloudVault SaaS", sector: "Enterprise SaaS", reqs: 8000, wqBase: 17.4, wqAgent: 0.8, lqBase: 40, lqAgent: 0, deaBase: 0.58, deaAgent: 1.00, stpBase: 30.2, stpAgent: 95.6, dpmoBase: 39600, dpmoAgent: 2.8, mttrBase: 131, mttrAgent: 35, qBase: -2.17, qAgent: 0.91, wasteBase: 31.5, wasteAgent: 1.4 },
+    { id: "COMP-047", name: "AppScale Infrastructure", sector: "Enterprise SaaS", reqs: 6600, wqBase: 17.8, wqAgent: 0.9, lqBase: 42, lqAgent: 0, deaBase: 0.56, deaAgent: 1.00, stpBase: 29.2, stpAgent: 95.1, dpmoBase: 40600, dpmoAgent: 3.0, mttrBase: 134, mttrAgent: 38, qBase: -2.22, qAgent: 0.88, wasteBase: 32.4, wasteAgent: 1.5 },
+    { id: "COMP-048", name: "HealthCloud One", sector: "Healthcare Tech", reqs: 4300, wqBase: 18.5, wqAgent: 1.2, lqBase: 45, lqAgent: 0, deaBase: 0.53, deaAgent: 1.00, stpBase: 27.7, stpAgent: 94.1, dpmoBase: 42100, dpmoAgent: 3.5, mttrBase: 140, mttrAgent: 45, qBase: -2.36, qAgent: 0.81, wasteBase: 33.9, wasteAgent: 1.9 },
+    { id: "COMP-049", name: "RetailSync Core", sector: "E-Commerce & Retail", reqs: 5100, wqBase: 18.1, wqAgent: 1.1, lqBase: 44, lqAgent: 0, deaBase: 0.54, deaAgent: 1.00, stpBase: 28.4, stpAgent: 94.6, dpmoBase: 41300, dpmoAgent: 3.3, mttrBase: 137, mttrAgent: 41, qBase: -2.30, qAgent: 0.84, wasteBase: 33.2, wasteAgent: 1.7 },
+    { id: "COMP-050", name: "GlobalTelecom Infrastructure", sector: "Telecommunications", reqs: 9100, wqBase: 17.2, wqAgent: 0.8, lqBase: 39, lqAgent: 0, deaBase: 0.59, deaAgent: 1.00, stpBase: 30.7, stpAgent: 96.0, dpmoBase: 39000, dpmoAgent: 2.7, mttrBase: 130, mttrAgent: 33, qBase: -2.13, qAgent: 0.93, wasteBase: 31.0, wasteAgent: 1.2 }
+];
+
 const somQuantitativeMetrics = [
     {
         domain: "Managing Waiting Lines & Queuing Theory",
         module: "Queuing & Waiting Lines",
         metric: "Mean Wait Time (Wq)",
         baseline: "18.5 Hours",
-        baselineRaw: 18.5 * 60, // minutes
+        baselineRaw: 18.5 * 60,
         agentic: "< 1.2 Minutes",
-        agenticRaw: 1.2, // minutes
+        agenticRaw: 1.2,
         formula: "Wq = λ / (μ * (μ - λ)) [M/M/1 Model]",
         gain: "+98.9% Reduction",
         pctGain: 98.9
@@ -71,7 +124,7 @@ const somQuantitativeMetrics = [
         baseline: "140 Minutes",
         baselineRaw: 140,
         agentic: "< 90 Seconds",
-        agenticRaw: 1.5, // minutes
+        agenticRaw: 1.5,
         formula: "MTTR = Σ(Down Time) / Incident Count",
         gain: "+98.9% Speedup",
         pctGain: 98.9
@@ -103,7 +156,6 @@ const somQuantitativeMetrics = [
 ];
 
 const somDatabase = [
-    // Service Process & System Design
     {
         module: "Service Process & System Design",
         aspect: "Blueprint Adaptability",
@@ -125,8 +177,6 @@ const somDatabase = [
         orchestrated: "Unified agentic orchestration crossing boundaries instantly through programmatic API calls.",
         advantage: "Prevents process delays and eliminates queue backlogs between departments."
     },
-    
-    // Service Encounter
     {
         module: "Service Encounter",
         aspect: "Interaction Interface",
@@ -148,8 +198,6 @@ const somDatabase = [
         orchestrated: "Automated log parsing with packaged diagnostics ready for human-in-the-loop validation.",
         advantage: "Speeds up troubleshooting and resolution for complex technical faults."
     },
-
-    // Service Layouts & Process Analysis
     {
         module: "Service Layouts & Process Analysis",
         aspect: "Layout Transparency",
@@ -171,8 +219,6 @@ const somDatabase = [
         orchestrated: "Immutable template structures minimizing task execution steps.",
         advantage: "Standardizes critical path execution times."
     },
-
-    // Service Quality & Process Control
     {
         module: "Service Quality & Process Control",
         aspect: "Compliance Auditing",
@@ -194,8 +240,6 @@ const somDatabase = [
         orchestrated: "Autonomic self-healing engines rebuilding corrupted nodes instantly.",
         advantage: "Maintains maximum uptime without developer intervention."
     },
-
-    // Measuring Service Productivity
     {
         module: "Measuring Service Productivity",
         aspect: "Labor Productivity",
@@ -217,8 +261,6 @@ const somDatabase = [
         orchestrated: "Streamlined execution where processing time equals total cycle time.",
         advantage: "Maximizes value-adding activity ratios."
     },
-
-    // Managing Waiting Lines & Queuing Theory
     {
         module: "Managing Waiting Lines & Queuing Theory",
         aspect: "Queuing Architecture",
@@ -240,8 +282,6 @@ const somDatabase = [
         orchestrated: "Dynamic auto-scaling provisions nodes matching real-time request counts.",
         advantage: "Absorbs sudden request spikes without performance degradation."
     },
-
-    // Service Strategy & SLA Management
     {
         module: "Service Strategy & SLA Management",
         aspect: "Competitive Dimension",
@@ -263,8 +303,6 @@ const somDatabase = [
         orchestrated: "IT acts as an innovation partner accelerating development.",
         advantage: "Shifts business perspective of infrastructure operations."
     },
-
-    // Technology-Driven Service Operations
     {
         module: "Technology-Driven Service Operations",
         aspect: "System Integration",
@@ -294,6 +332,7 @@ const somDatabase = [
 let activeTab = "baseline"; // baseline | agentic | comparison
 let matrixFilterCategory = "all";
 let metricDisplayMode = "raw"; // raw | percentage
+let datasetSectorFilter = "all";
 let radarChartInstance = null;
 let barChartInstance = null;
 
@@ -302,11 +341,11 @@ let baselineSimActive = false;
 let agenticSimActive = false;
 let baselineProgress = 0;
 let agenticProgress = 0;
-let baselineWqCounter = 18.5; // Hours
+let baselineWqCounter = 18.5;
 let baselineTimerInterval = null;
 
 // Interactive Overlay Modal State
-let overlayVisType = 'blueprint'; // blueprint | qfd | queue | dea
+let overlayVisType = 'blueprint';
 let overlayVisAgentic = false;
 let overlayOpen = false;
 let overlayAnimId = null;
@@ -327,7 +366,6 @@ let agenticServers = [
 ];
 let agenticTotalProcessed = 0;
 
-// Blueprint & DEA animation variables
 let blueprintT = 0;
 let deaPointProgress = 0;
 
@@ -335,28 +373,30 @@ let deaPointProgress = 0;
 // 3. INITIALIZATION & NAVIGATION BINDING
 // ==========================================
 document.addEventListener("DOMContentLoaded", () => {
-    // Navigation Tabs
     document.getElementById("nav-btn-baseline").addEventListener("click", () => switchTab("baseline"));
     document.getElementById("nav-btn-agentic").addEventListener("click", () => switchTab("agentic"));
     document.getElementById("nav-btn-comparison").addEventListener("click", () => switchTab("comparison"));
 
-    // Metric Mode Toggle Controls (Page 3)
     document.getElementById("btn-metric-raw").addEventListener("click", () => switchMetricMode("raw"));
     document.getElementById("btn-metric-pct").addEventListener("click", () => switchMetricMode("percentage"));
 
-    // Pipeline Simulators
     document.getElementById("btn-baseline-simulate").addEventListener("click", startBaselineSimulation);
     document.getElementById("btn-agent-simulate").addEventListener("click", startAgenticSimulation);
 
-    // Modal Close
     document.getElementById("vis-overlay-close").addEventListener("click", closeVisOverlay);
 
-    // Enter key support for input field
+    const sectorSelect = document.getElementById("select-dataset-sector");
+    if (sectorSelect) {
+        sectorSelect.addEventListener("change", (e) => {
+            datasetSectorFilter = e.target.value;
+            renderDatasetTable();
+        });
+    }
+
     document.getElementById("ipt-agent-prompt").addEventListener("keypress", (e) => {
         if(e.key === "Enter") startAgenticSimulation();
     });
 
-    // Comparison Matrix Filter Pills
     document.querySelectorAll("#matrix-filter-container button").forEach(btn => {
         btn.addEventListener("click", () => {
             document.querySelectorAll("#matrix-filter-container button").forEach(b => b.classList.remove("active"));
@@ -368,10 +408,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     renderExplorerList();
     renderMatrixTable();
+    renderDatasetTable();
     initBarChart();
     initRadarChart();
 
-    // Start frame loop
     requestAnimationFrame(animationLoop);
 });
 
@@ -414,7 +454,58 @@ function switchMetricMode(mode) {
 }
 
 // ==========================================
-// 4. SOM EXPLORER SIDEBAR & SLIDING DRAWER
+// 4. 50-COMPANY DATASET EXPLORER & CSV DOWNLOAD
+// ==========================================
+function renderDatasetTable() {
+    const tbody = document.getElementById("table-dataset-50-tbody");
+    if (!tbody) return;
+    tbody.innerHTML = "";
+
+    companies50Dataset.forEach(comp => {
+        if (datasetSectorFilter !== "all" && comp.sector !== datasetSectorFilter) {
+            return;
+        }
+
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-slate-50 transition-colors border-b border-slate-200";
+        tr.innerHTML = `
+            <td class="py-2.5 px-3 font-bold text-slate-500 font-mono text-[9px]">${comp.id}</td>
+            <td class="py-2.5 px-3 font-bold text-slate-900">${comp.name}</td>
+            <td class="py-2.5 px-3 text-slate-600"><span class="px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-[8.5px] font-semibold">${comp.sector}</span></td>
+            <td class="py-2.5 px-3 font-bold text-rose-700 font-mono">${comp.wqBase}h</td>
+            <td class="py-2.5 px-3 font-bold text-emerald-700 font-mono">${comp.wqAgent}m</td>
+            <td class="py-2.5 px-3 font-bold text-rose-700 font-mono">${comp.stpBase}%</td>
+            <td class="py-2.5 px-3 font-bold text-emerald-700 font-mono">${comp.stpAgent}%</td>
+            <td class="py-2.5 px-3 font-bold text-rose-700 font-mono">${comp.dpmoBase.toLocaleString()}</td>
+            <td class="py-2.5 px-3 font-bold text-emerald-700 font-mono">${comp.dpmoAgent}</td>
+            <td class="py-2.5 px-3 font-bold text-indigo-700 font-mono">${comp.deaAgent.toFixed(2)}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function downloadCSVDataset() {
+    let csvContent = "data:text/csv;charset=utf-8,";
+    csvContent += "Company_ID,Company_Name,Industry_Sector,Monthly_Deployments,Wq_Baseline_Hrs,Wq_Agentic_Min,Lq_Baseline_Req,Lq_Agentic_Req,DEA_Baseline_Theta,DEA_Agentic_Theta,STP_Baseline_Pct,STP_Agentic_Pct,DPMO_Baseline,DPMO_Agentic,MTTR_Baseline_Min,MTTR_Agentic_Sec,SERVQUAL_Baseline_Q,SERVQUAL_Agentic_Q,Waste_Baseline_Pct,Waste_Agentic_Pct\n";
+
+    companies50Dataset.forEach(c => {
+        let row = [
+            c.id, `"${c.name}"`, `"${c.sector}"`, c.reqs, c.wqBase, c.wqAgent, c.lqBase, c.lqAgent, c.deaBase, c.deaAgent, c.stpBase, c.stpAgent, c.dpmoBase, c.dpmoAgent, c.mttrBase, c.mttrAgent, c.qBase, c.qAgent, c.wasteBase, c.wasteAgent
+        ].join(",");
+        csvContent += row + "\n";
+    });
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "som_benchmark_dataset_50_companies.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// ==========================================
+// 5. SOM EXPLORER SIDEBAR & SLIDING DRAWER
 // ==========================================
 function renderExplorerList() {
     const listContainer = document.getElementById("som-explorer-list");
@@ -459,19 +550,16 @@ function openSOMDrawer(modName) {
     
     renderDrawerMicroVisual(modName);
 
-    // Bind Aspect 1
     document.getElementById("drawer-aspect-1-title").textContent = items[0].aspect;
     document.getElementById("drawer-aspect-1-trad").textContent = items[0].traditional;
     document.getElementById("drawer-aspect-1-orchestrated").textContent = items[0].orchestrated;
     document.getElementById("drawer-aspect-1-adv").textContent = items[0].advantage;
 
-    // Bind Aspect 2
     document.getElementById("drawer-aspect-2-title").textContent = items[1].aspect;
     document.getElementById("drawer-aspect-2-trad").textContent = items[1].traditional;
     document.getElementById("drawer-aspect-2-orchestrated").textContent = items[1].orchestrated;
     document.getElementById("drawer-aspect-2-adv").textContent = items[1].advantage;
 
-    // Bind Aspect 3
     document.getElementById("drawer-aspect-3-title").textContent = items[2].aspect;
     document.getElementById("drawer-aspect-3-trad").textContent = items[2].traditional;
     document.getElementById("drawer-aspect-3-orchestrated").textContent = items[2].orchestrated;
@@ -512,7 +600,7 @@ function renderDrawerMicroVisual(modName) {
 }
 
 // ==========================================
-// 5. INTERACTIVE OVERLAY MODALS (BLUEPRINT, QFD, QUEUE, DEA)
+// 6. INTERACTIVE OVERLAY MODALS
 // ==========================================
 function openVisOverlay(type, isAgentic) {
     overlayVisType = type;
@@ -921,7 +1009,6 @@ function drawDEAVisual(ctx, w, h) {
     let chartW = w - 120;
     let chartH = h - 110;
 
-    // Draw Axes
     ctx.strokeStyle = "rgba(148, 163, 184, 0.4)";
     ctx.lineWidth = 1.5;
     ctx.beginPath();
@@ -935,7 +1022,6 @@ function drawDEAVisual(ctx, w, h) {
     ctx.fillText("OUTPUT: Service Throughput (Deployments / Hour)", originX + 10, 30);
     ctx.fillText("INPUT: Operational Labor Cost & Cycle Time (x_i)", originX + chartW - 200, originY + 30);
 
-    // Convex Efficiency Frontier Curve (θ = 1.00)
     ctx.strokeStyle = "#10b981";
     ctx.lineWidth = 2.5;
     ctx.beginPath();
@@ -947,12 +1033,11 @@ function drawDEAVisual(ctx, w, h) {
     ctx.font = "bold 9px Outfit";
     ctx.fillText("CONVEX EFFICIENCY FRONTIER (θ = 1.00)", originX + chartW * 0.4, originY - chartH * 0.85);
 
-    // DMUs (Data Envelopment Units)
     const dmus = [
-        { name: "DMU-1 (VM Staging)", baseInput: 0.75, baseOutput: 0.35, targetInput: 0.75, targetOutput: 0.75 },
-        { name: "DMU-2 (API Gateway)", baseInput: 0.55, baseOutput: 0.25, targetInput: 0.55, targetOutput: 0.82 },
-        { name: "DMU-3 (DB Cluster)", baseInput: 0.85, baseOutput: 0.42, targetInput: 0.85, targetOutput: 0.65 },
-        { name: "DMU-4 (Debug Env)", baseInput: 0.35, baseOutput: 0.18, targetInput: 0.35, targetOutput: 0.88 }
+        { name: "DMU-1 (FinTech Ops)", baseInput: 0.75, baseOutput: 0.35, targetInput: 0.75, targetOutput: 0.75 },
+        { name: "DMU-2 (Enterprise SaaS)", baseInput: 0.55, baseOutput: 0.25, targetInput: 0.55, targetOutput: 0.82 },
+        { name: "DMU-3 (Healthcare Cloud)", baseInput: 0.85, baseOutput: 0.42, targetInput: 0.85, targetOutput: 0.65 },
+        { name: "DMU-4 (Retail E-Com)", baseInput: 0.35, baseOutput: 0.18, targetInput: 0.35, targetOutput: 0.88 }
     ];
 
     if (overlayVisAgentic) {
@@ -1177,7 +1262,7 @@ function drawQueueVisual(ctx, w, h) {
 }
 
 // ==========================================
-// 6. PIPELINE SIMULATIONS & METRIC COUNTERS
+// 7. PIPELINE SIMULATIONS & METRIC COUNTERS
 // ==========================================
 function startBaselineSimulation() {
     if (baselineSimActive) return;
@@ -1223,7 +1308,6 @@ function startAgenticSimulation() {
     consoleEl.innerHTML = "";
     logMessage("INTENT PARSER", `Received prompt: "${promptVal}"`);
     
-    // Live metric updates
     document.getElementById("metric-a-wq").textContent = "< 0.8 Mins";
     document.getElementById("metric-a-stp").textContent = "94%";
     document.getElementById("metric-a-mttr").textContent = "45 Secs";
@@ -1355,10 +1439,11 @@ function getNodeCoordinates(nodeIndex, canvasW, canvasH) {
 }
 
 // ==========================================
-// 7. PAGE 3: QUANTITATIVE MATRIX & BAR CHART
+// 8. PAGE 3: QUANTITATIVE MATRIX & BAR CHART
 // ==========================================
 function renderMatrixTable() {
     const tbody = document.getElementById("matrix-tbody");
+    if (!tbody) return;
     tbody.innerHTML = "";
 
     somQuantitativeMetrics.forEach(item => {
@@ -1445,7 +1530,6 @@ function updateBarChart() {
             }
         ];
     } else {
-        // Percentage Gains
         barChartInstance.data.labels = ['Wait Time Red.', 'Queue Red.', 'DEA Gain', 'STP Gain', 'DPMO Drop', 'MTTR Speed', 'SERVQUAL', 'Waste Cut'];
         barChartInstance.data.datasets = [
             {
@@ -1462,7 +1546,7 @@ function updateBarChart() {
 }
 
 // ==========================================
-// 8. CHART.JS COMPARATIVE RADAR
+// 9. CHART.JS COMPARATIVE RADAR
 // ==========================================
 function initRadarChart() {
     const ctx = document.getElementById("radarChart").getContext("2d");
