@@ -52,7 +52,7 @@
                 <h1 class="text-xl md:text-2xl font-extrabold font-outfit tracking-tight bg-gradient-to-r from-slate-900 via-indigo-900 to-cyan-700 bg-clip-text text-transparent">
                     Autonomous DevEaaS: An Operations Management Evaluation
                 </h1>
-                <p class="text-xs text-slate-500 mt-0.5">Discrete-Event Simulation Engine &bull; Grounded in DORA & ITIL v4 Benchmarks</p>
+                <p class="text-xs text-slate-500 mt-0.5">Discrete-Event Particle Simulator &bull; Grounded in DORA & ITIL v4 Benchmarks</p>
             </div>
             
             <div class="flex items-center gap-3 self-start md:self-center">
@@ -70,7 +70,7 @@
                         <span class="w-2 h-2 rounded-full bg-emerald-500"></span> 2. Agentic Simulation
                     </button>
                     <button id="nav-btn-comparison" class="nav-tab flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-300">
-                        <span class="w-2 h-2 rounded-full bg-cyan-600"></span> 3. Monte Carlo & Matrix
+                        <span class="w-2 h-2 rounded-full bg-cyan-600"></span> 3. ROI & Analytics
                     </button>
                 </nav>
             </div>
@@ -87,11 +87,11 @@
             <main id="page-baseline" class="flex flex-col gap-6 animate-fade">
                 <div class="light-card p-5 rounded-3xl border border-rose-200 bg-white shadow-xl relative">
                     <!-- Section Title -->
-                    <div class="flex justify-between items-center mb-5">
+                    <div class="flex justify-between items-center mb-4">
                         <div>
                             <h3 class="font-outfit text-base font-bold text-rose-800 flex items-center gap-2">
                                 <i class="fa-solid fa-hourglass-half text-rose-600 animate-spin-slow"></i> 
-                                Traditional M/M/1 Helpdesk Simulation Environment
+                                Traditional M/M/1 Helpdesk Interactive Particle Simulator
                             </h3>
                             <p class="text-slate-500 text-[10px] uppercase font-bold tracking-wider">Manual ITIL SLA: 14.2h Wait &bull; 18 Request Queue Backlog &bull; θ = 0.62 Efficiency</p>
                         </div>
@@ -100,13 +100,46 @@
                         </span>
                     </div>
 
-                    <!-- DISCRETE EVENT SIMULATION CONTROLS & LIVE PLOT -->
-                    <div class="bg-rose-50/50 p-4 rounded-2xl border border-rose-200 mb-5">
+                    <!-- OPERATIONAL STRESS-TEST PRESET BUTTONS -->
+                    <div class="mb-4 bg-slate-50 p-3 rounded-2xl border border-slate-200 flex flex-wrap items-center gap-2">
+                        <span class="text-[9px] uppercase font-extrabold text-slate-500 mr-1"><i class="fa-solid fa-bolt text-amber-500"></i> Stress-Test Presets:</span>
+                        <button onclick="applyScenarioPreset('surge', 'b')" class="px-2.5 py-1 rounded-lg bg-white border border-slate-300 hover:border-rose-400 text-[9.5px] font-bold text-slate-700 hover:text-rose-700 transition-all flex items-center gap-1">
+                            🚀 Black Friday Surge (λ=30)
+                        </button>
+                        <button onclick="applyScenarioPreset('lockdown', 'b')" class="px-2.5 py-1 rounded-lg bg-white border border-slate-300 hover:border-rose-400 text-[9.5px] font-bold text-slate-700 hover:text-rose-700 transition-all flex items-center gap-1">
+                            🛡️ Security Audit (σ=22%)
+                        </button>
+                        <button onclick="applyScenarioPreset('legacy', 'b')" class="px-2.5 py-1 rounded-lg bg-white border border-slate-300 hover:border-rose-400 text-[9.5px] font-bold text-slate-700 hover:text-rose-700 transition-all flex items-center gap-1">
+                            🐢 Legacy ITIL Shift (μ=3)
+                        </button>
+                    </div>
+
+                    <!-- LIVE HTML5 PARTICLE QUEUING CANVAS -->
+                    <div class="relative rounded-2xl border border-rose-200 bg-slate-900 p-2 min-h-[220px] mb-4 flex flex-col justify-between overflow-hidden shadow-inner">
+                        <div class="flex items-center justify-between px-3 py-1.5 bg-slate-900/90 backdrop-blur border-b border-slate-800 z-10">
+                            <span class="text-[10px] font-bold font-mono text-rose-400 flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span> Live Particle Physics Queuing Model (M/M/1 Helpdesk)
+                            </span>
+                            <span class="text-[9px] font-mono text-slate-400" id="txt-particle-status-b">Incoming: 18 req/hr &bull; Server: Single Human</span>
+                        </div>
+                        
+                        <canvas id="canvas-des-particle-b" width="700" height="160" class="block w-full h-[160px] rounded-xl z-0"></canvas>
+                        
+                        <div class="flex items-center justify-between px-3 py-1 bg-slate-900/90 border-t border-slate-800 text-[9px] font-mono text-slate-400 z-10">
+                            <span>🔴 Request Particle</span>
+                            <span>📦 Queue Lane (Lq)</span>
+                            <span>👨‍💻 Human Operator Node</span>
+                            <span class="text-rose-400 font-bold">😡 Balking / Reneging</span>
+                        </div>
+                    </div>
+
+                    <!-- DISCRETE EVENT SIMULATION CONTROLS -->
+                    <div class="bg-rose-50/50 p-4 rounded-2xl border border-rose-200 mb-4">
                         <div class="flex items-center justify-between mb-3">
                             <h4 class="text-xs font-bold font-outfit text-rose-900 uppercase tracking-wider flex items-center gap-1.5">
-                                <i class="fa-solid fa-sliders text-rose-600"></i> Discrete-Event Simulation Controls (Baseline Environment)
+                                <i class="fa-solid fa-sliders text-rose-600"></i> Interactive Parameter Controls (Baseline Environment)
                             </h4>
-                            <span class="text-[9px] font-mono text-rose-700 bg-white px-2 py-0.5 rounded border border-rose-200 font-bold">M/M/1 Model</span>
+                            <span class="text-[9px] font-mono text-rose-700 bg-white px-2 py-0.5 rounded border border-rose-200 font-bold">Live Slider Adjustments</span>
                         </div>
                         
                         <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-3">
@@ -140,8 +173,8 @@
                         </div>
                     </div>
 
-                    <!-- Pipeline Canvas/Visual Container -->
-                    <div class="relative rounded-2xl border border-rose-100 bg-slate-900 p-4 min-h-[160px] flex items-center">
+                    <!-- Pipeline Canvas Container -->
+                    <div class="relative rounded-2xl border border-rose-100 bg-slate-900 p-4 min-h-[140px] flex items-center">
                         <div class="grid grid-cols-5 gap-3 w-full relative z-10">
                             <!-- Node 1 -->
                             <div class="pipeline-node group relative p-3 rounded-xl border border-slate-800 bg-slate-900/90 text-center hover:border-rose-400 transition-all cursor-help" data-node="b1">
@@ -245,11 +278,11 @@
             <main id="page-agentic" class="hidden flex flex-col gap-6 animate-fade">
                 <div class="light-card p-5 rounded-3xl border border-emerald-200 bg-white shadow-xl relative">
                     <!-- Section Title -->
-                    <div class="flex justify-between items-center mb-5">
+                    <div class="flex justify-between items-center mb-4">
                         <div>
                             <h3 class="font-outfit text-base font-bold text-emerald-800 flex items-center gap-2">
                                 <i class="fa-solid fa-robot text-emerald-600"></i>
-                                Autonomous AI + Cloudify & Terraform Simulation Environment
+                                Autonomous AI + Cloudify & Terraform Interactive Particle Simulator
                             </h3>
                             <p class="text-slate-500 text-[10px] uppercase font-bold tracking-wider">Defensible Benchmarks: Wq = 48.5m &bull; Lq = 2 jobs &bull; STP = 78.2% &bull; θ = 0.89</p>
                         </div>
@@ -258,13 +291,43 @@
                         </span>
                     </div>
 
-                    <!-- DISCRETE EVENT SIMULATION CONTROLS & LIVE PLOT -->
-                    <div class="bg-emerald-50/50 p-4 rounded-2xl border border-emerald-200 mb-5">
+                    <!-- OPERATIONAL STRESS-TEST PRESET BUTTONS -->
+                    <div class="mb-4 bg-slate-50 p-3 rounded-2xl border border-slate-200 flex flex-wrap items-center gap-2">
+                        <span class="text-[9px] uppercase font-extrabold text-slate-500 mr-1"><i class="fa-solid fa-bolt text-emerald-500"></i> Stress-Test Presets:</span>
+                        <button onclick="applyScenarioPreset('optimal', 'a')" class="px-2.5 py-1 rounded-lg bg-white border border-slate-300 hover:border-emerald-400 text-[9.5px] font-bold text-slate-700 hover:text-emerald-700 transition-all flex items-center gap-1">
+                            ⚡ Optimal Auto-Scaling (c=8 nodes)
+                        </button>
+                        <button onclick="applyScenarioPreset('surge', 'a')" class="px-2.5 py-1 rounded-lg bg-white border border-slate-300 hover:border-emerald-400 text-[9.5px] font-bold text-slate-700 hover:text-emerald-700 transition-all flex items-center gap-1">
+                            🚀 Black Friday Surge (λ=50)
+                        </button>
+                    </div>
+
+                    <!-- LIVE HTML5 PARTICLE QUEUING CANVAS -->
+                    <div class="relative rounded-2xl border border-emerald-200 bg-slate-900 p-2 min-h-[220px] mb-4 flex flex-col justify-between overflow-hidden shadow-inner">
+                        <div class="flex items-center justify-between px-3 py-1.5 bg-slate-900/90 backdrop-blur border-b border-slate-800 z-10">
+                            <span class="text-[10px] font-bold font-mono text-emerald-400 flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span> Live Particle Physics Queuing Model (M/M/c Agent API Workers)
+                            </span>
+                            <span class="text-[9px] font-mono text-slate-400" id="txt-particle-status-a">Incoming: 35 req/hr &bull; Parallel Worker Nodes: 6</span>
+                        </div>
+                        
+                        <canvas id="canvas-des-particle-a" width="700" height="160" class="block w-full h-[160px] rounded-xl z-0"></canvas>
+                        
+                        <div class="flex items-center justify-between px-3 py-1 bg-slate-900/90 border-t border-slate-800 text-[9px] font-mono text-slate-400 z-10">
+                            <span>🟢 Prompt Particle</span>
+                            <span>🧠 AI Intent Parser</span>
+                            <span>🛡️ Policy Guardrail</span>
+                            <span>⚙️ Cloudify + Terraform Engine</span>
+                        </div>
+                    </div>
+
+                    <!-- DISCRETE EVENT SIMULATION CONTROLS -->
+                    <div class="bg-emerald-50/50 p-4 rounded-2xl border border-emerald-200 mb-4">
                         <div class="flex items-center justify-between mb-3">
                             <h4 class="text-xs font-bold font-outfit text-emerald-900 uppercase tracking-wider flex items-center gap-1.5">
-                                <i class="fa-solid fa-sliders text-emerald-600"></i> Discrete-Event Simulation Controls (Agentic Environment)
+                                <i class="fa-solid fa-sliders text-emerald-600"></i> Interactive Parameter Controls (Agentic Environment)
                             </h4>
-                            <span class="text-[9px] font-mono text-emerald-700 bg-white px-2 py-0.5 rounded border border-emerald-200 font-bold">M/M/c API Model</span>
+                            <span class="text-[9px] font-mono text-emerald-700 bg-white px-2 py-0.5 rounded border border-emerald-200 font-bold">Live Slider Adjustments</span>
                         </div>
                         
                         <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-3">
@@ -298,8 +361,8 @@
                         </div>
                     </div>
 
-                    <!-- Pipeline Canvas/Visual Container -->
-                    <div class="relative rounded-2xl border border-emerald-100 bg-slate-900 p-4 min-h-[160px] flex items-center">
+                    <!-- Pipeline Canvas Container -->
+                    <div class="relative rounded-2xl border border-emerald-100 bg-slate-900 p-4 min-h-[140px] flex items-center">
                         <div class="grid grid-cols-5 gap-3 w-full relative z-10">
                             <!-- Node 1 -->
                             <div class="pipeline-node group relative p-3 rounded-xl border border-slate-800 bg-slate-900/90 text-center hover:border-emerald-400 transition-all cursor-help" data-node="a1">
@@ -423,19 +486,18 @@
                 </div>
             </main>
 
-            <!-- PAGE 3: COMPREHENSIVE MONTE CARLO EXPERIMENTATION & DATASET explorer -->
+            <!-- PAGE 3: INTERACTIVE FINANCIAL ROI CALCULATOR & MONTE CARLO ANALYTICS -->
             <main id="page-comparison" class="hidden flex flex-col gap-6 animate-fade">
                 <div class="light-card p-5 border border-slate-200 rounded-3xl bg-white shadow-xl flex flex-col gap-6">
                     
-                    <!-- Section Header & Metric Toggle Controls -->
+                    <!-- Section Header -->
                     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-4">
                         <div>
-                            <h2 class="text-base font-bold font-outfit text-slate-900 uppercase tracking-wider">Monte Carlo Simulation Experimentation Suite</h2>
-                            <p class="text-slate-500 text-[10px] uppercase font-bold tracking-wider">Statistical Validation Across 100 Simulated Experiment Runs &bull; Grounded in DORA Benchmarks</p>
+                            <h2 class="text-base font-bold font-outfit text-slate-900 uppercase tracking-wider">Interactive Financial ROI & Operational Analytics</h2>
+                            <p class="text-slate-500 text-[10px] uppercase font-bold tracking-wider">Calculate Labor Hours & Annual Cloud Cost Savings in Real Time</p>
                         </div>
                         
                         <div class="flex items-center gap-3 self-start md:self-auto">
-                            <!-- Toggle Switch: Raw Metrics vs Percentage Improvement -->
                             <div class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
                                 <button id="btn-metric-raw" class="metric-toggle-btn active px-3 py-1.5 rounded-lg text-[10px] font-extrabold uppercase transition-all">
                                     <i class="fa-solid fa-calculator mr-1"></i> Raw Values
@@ -445,34 +507,59 @@
                                 </button>
                             </div>
                             
-                            <!-- Download CSV Button -->
                             <button onclick="downloadCSVDataset()" class="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all shadow flex items-center gap-1.5">
                                 <i class="fa-solid fa-download text-emerald-400"></i> Download CSV
                             </button>
                         </div>
                     </div>
 
-                    <!-- Statistical Validation Summary Badges -->
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
-                        <div class="bg-indigo-50/70 p-3 rounded-2xl border border-indigo-200">
-                            <span class="block text-[8px] uppercase text-indigo-700 font-extrabold tracking-wider">Sample Size</span>
-                            <span class="text-slate-900 font-extrabold text-base">50 Enterprises</span>
-                            <span class="block text-[8px] text-indigo-600 font-medium">Across 6 Industry Sectors</span>
+                    <!-- INTERACTIVE FINANCIAL ROI COST SAVINGS CALCULATOR -->
+                    <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 p-5 rounded-2xl border border-indigo-800 text-white shadow-lg">
+                        <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+                            <h3 class="font-outfit text-sm font-bold text-cyan-400 uppercase tracking-wider flex items-center gap-2">
+                                <i class="fa-solid fa-calculator text-cyan-400"></i> Interactive Annual Financial ROI & Labor Savings Calculator
+                            </h3>
+                            <span class="text-[9px] font-mono bg-indigo-900/60 px-2.5 py-0.5 rounded border border-indigo-700 text-indigo-300 font-bold">Real-Time Enterprise Projections</span>
                         </div>
-                        <div class="bg-emerald-50/70 p-3 rounded-2xl border border-emerald-200">
-                            <span class="block text-[8px] uppercase text-emerald-700 font-extrabold tracking-wider">Statistical Significance</span>
-                            <span class="text-emerald-800 font-extrabold text-base">p &lt; 0.01</span>
-                            <span class="block text-[8px] text-emerald-600 font-medium">Paired t-Test Validated</span>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-5">
+                            <div>
+                                <label class="block text-[9px] uppercase font-bold text-slate-300 mb-1.5">Engineering Headcount (Developers)</label>
+                                <input type="range" id="roi-devs" min="10" max="500" value="75" step="5" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-cyan-400" oninput="updateROICalculator()">
+                                <span id="lbl-roi-devs" class="text-xs font-mono font-bold text-cyan-400">75 Developers</span>
+                            </div>
+
+                            <div>
+                                <label class="block text-[9px] uppercase font-bold text-slate-300 mb-1.5">Average Engineer Hourly Rate ($/hr)</label>
+                                <input type="range" id="roi-rate" min="35" max="150" value="65" step="5" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-cyan-400" oninput="updateROICalculator()">
+                                <span id="lbl-roi-rate" class="text-xs font-mono font-bold text-cyan-400">$65 / hour</span>
+                            </div>
+
+                            <div>
+                                <label class="block text-[9px] uppercase font-bold text-slate-300 mb-1.5">Monthly Cloud Budget ($/mo)</label>
+                                <input type="range" id="roi-cloud" min="5000" max="150000" value="35000" step="5000" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-cyan-400" oninput="updateROICalculator()">
+                                <span id="lbl-roi-cloud" class="text-xs font-mono font-bold text-cyan-400">$35,000 / month</span>
+                            </div>
                         </div>
-                        <div class="bg-cyan-50/70 p-3 rounded-2xl border border-cyan-200">
-                            <span class="block text-[8px] uppercase text-cyan-800 font-extrabold tracking-wider">Mean Wait Reduction</span>
-                            <span class="text-slate-900 font-extrabold text-base">94.3% Reduction</span>
-                            <span class="block text-[8px] text-cyan-700 font-medium">14.2h Drop to 48.5 Mins</span>
-                        </div>
-                        <div class="bg-amber-50/70 p-3 rounded-2xl border border-amber-200">
-                            <span class="block text-[8px] uppercase text-amber-800 font-extrabold tracking-wider">DEA Frontier Optimization</span>
-                            <span class="text-amber-900 font-extrabold text-base">θ = 0.89</span>
-                            <span class="block text-[8px] text-amber-700 font-medium">Defensible High Frontier</span>
+
+                        <!-- Computed ROI Results Cards -->
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center font-mono pt-3 border-t border-slate-800">
+                            <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
+                                <span class="block text-[8px] uppercase text-slate-400 font-bold">Annual Labor Hours Saved</span>
+                                <span id="roi-hours-saved" class="text-emerald-400 font-extrabold text-base">12,420 Hours</span>
+                            </div>
+                            <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
+                                <span class="block text-[8px] uppercase text-slate-400 font-bold">Labor Cost Saved ($)</span>
+                                <span id="roi-labor-saved" class="text-emerald-400 font-extrabold text-base">$807,300</span>
+                            </div>
+                            <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
+                                <span class="block text-[8px] uppercase text-slate-400 font-bold">Cloud Waste Reclaimed ($)</span>
+                                <span id="roi-cloud-saved" class="text-cyan-400 font-extrabold text-base">$95,760</span>
+                            </div>
+                            <div class="bg-slate-900/80 p-3 rounded-xl border border-indigo-800">
+                                <span class="block text-[8px] uppercase text-indigo-300 font-bold">Total Annual ROI</span>
+                                <span id="roi-total-saved" class="text-cyan-300 font-extrabold text-base">$903,060 / yr</span>
+                            </div>
                         </div>
                     </div>
 
@@ -498,7 +585,7 @@
                         </div>
                     </div>
 
-                    <!-- Quantitative 8 SOM Domain Table with Formulas -->
+                    <!-- Quantitative 8 SOM Domain Table -->
                     <div class="overflow-hidden border border-slate-200 rounded-2xl bg-white">
                         <div class="px-4 py-3 bg-slate-100 border-b border-slate-200 flex items-center justify-between">
                             <h4 class="text-xs font-bold font-outfit text-slate-900 uppercase tracking-wider">
@@ -534,7 +621,6 @@
                                 <p class="text-slate-500 text-[9px] uppercase font-bold tracking-wider mt-0.5">Inspect Enterprise Records for Verification & Defense</p>
                             </div>
                             
-                            <!-- Sector Filter Dropdown -->
                             <div class="flex items-center gap-2">
                                 <span class="text-[10px] font-bold text-slate-600 uppercase">Sector:</span>
                                 <select id="select-dataset-sector" class="bg-white border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-800 focus:outline-none focus:border-indigo-500">
@@ -549,7 +635,6 @@
                             </div>
                         </div>
 
-                        <!-- Dataset Table -->
                         <div class="overflow-x-auto max-h-[360px]">
                             <table class="w-full text-left border-collapse font-mono text-[9.5px]">
                                 <thead>
@@ -665,7 +750,7 @@
         </div>
     </div>
 
-    <!-- ANIMATED OVERLAY MODAL FOR BLUEPRINT, QFD, QUEUE, & DEA -->
+    <!-- ANIMATED OVERLAY MODAL -->
     <div id="vis-overlay-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm opacity-0 pointer-events-none transition-all duration-300">
         <div class="light-card max-w-4xl w-full mx-4 rounded-3xl overflow-hidden border border-slate-300 bg-white shadow-2xl relative flex flex-col max-h-[90vh]">
             <button id="vis-overlay-close" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 transition-colors w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 border border-slate-300 z-50">
