@@ -1,6 +1,29 @@
 // Services Operations Management Simulator & Orchestration Engine
 
 // ==========================================
+// 0. CANVAS POLYFILLS & SAFENG HELPERS
+// ==========================================
+if (typeof CanvasRenderingContext2D !== 'undefined' && !CanvasRenderingContext2D.prototype.roundRect) {
+    CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, radii) {
+        if (typeof radii === 'number') radii = [radii, radii, radii, radii];
+        const r = radii || [0, 0, 0, 0];
+        const r0 = r[0] || 0, r1 = r[1] || 0, r2 = r[2] || 0, r3 = r[3] || 0;
+        this.beginPath();
+        this.moveTo(x + r0, y);
+        this.lineTo(x + w - r1, y);
+        this.quadraticCurveTo(x + w, y, x + w, y + r1);
+        this.lineTo(x + w, y + h - r2);
+        this.quadraticCurveTo(x + w, y + h, x + w - r2, y + h);
+        this.lineTo(x + r3, y + h);
+        this.quadraticCurveTo(x, y + h, x, y + h - r3);
+        this.lineTo(x, y + r0);
+        this.quadraticCurveTo(x, y, x + r0, y);
+        this.closePath();
+        return this;
+    };
+}
+
+// ==========================================
 // 1. EMPIRICAL 50-COMPANY BENCHMARK DATASET
 // ==========================================
 const companies50Dataset = [
@@ -51,8 +74,6 @@ let barChartInstance = null;
 // Pipeline Simulation States
 let baselineSimActive = false;
 let agenticSimActive = false;
-let baselineWqCounter = 14.2;
-let baselineTimerInterval = null;
 
 // Overlay Modal State
 let overlayVisType = 'blueprint';
@@ -65,19 +86,52 @@ let desParticlesB = [];
 let desParticlesA = [];
 let desFrameCount = 0;
 
-// Initialization
+// ==========================================
+// 2. INITIALIZATION & SAFEGUARD BINDINGS
+// ==========================================
 document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById("nav-btn-baseline").addEventListener("click", () => switchTab("baseline"));
-    document.getElementById("nav-btn-agentic").addEventListener("click", () => switchTab("agentic"));
-    document.getElementById("nav-btn-comparison").addEventListener("click", () => switchTab("comparison"));
+    try { bindNavigation(); } catch (e) { console.error("Navigation error:", e); }
+    try { renderExplorerList(); } catch (e) { console.error("Explorer list error:", e); }
+    try { renderMatrixTable(); } catch (e) { console.error("Matrix table error:", e); }
+    try { renderDatasetTable(); } catch (e) { console.error("Dataset table error:", e); }
+    try { updateROICalculator(); } catch (e) { console.error("ROI calculator error:", e); }
 
-    document.getElementById("btn-metric-raw").addEventListener("click", () => switchMetricMode("raw"));
-    document.getElementById("btn-metric-pct").addEventListener("click", () => switchMetricMode("percentage"));
+    // Safely wait for Chart.js CDN script to finish loading before initializing charts
+    waitForChartJS();
 
-    document.getElementById("btn-baseline-simulate").addEventListener("click", startBaselineSimulation);
-    document.getElementById("btn-agent-simulate").addEventListener("click", startAgenticSimulation);
+    requestAnimationFrame(animationLoop);
+});
 
-    document.getElementById("vis-overlay-close").addEventListener("click", closeVisOverlay);
+function waitForChartJS() {
+    if (typeof Chart !== 'undefined') {
+        try { initBarChart(); } catch (e) { console.error("Bar chart error:", e); }
+        try { initRadarChart(); } catch (e) { console.error("Radar chart error:", e); }
+    } else {
+        setTimeout(waitForChartJS, 300);
+    }
+}
+
+function bindNavigation() {
+    const btnB = document.getElementById("nav-btn-baseline");
+    const btnA = document.getElementById("nav-btn-agentic");
+    const btnC = document.getElementById("nav-btn-comparison");
+
+    if (btnB) btnB.addEventListener("click", () => switchTab("baseline"));
+    if (btnA) btnA.addEventListener("click", () => switchTab("agentic"));
+    if (btnC) btnC.addEventListener("click", () => switchTab("comparison"));
+
+    const btnRaw = document.getElementById("btn-metric-raw");
+    const btnPct = document.getElementById("btn-metric-pct");
+    if (btnRaw) btnRaw.addEventListener("click", () => switchMetricMode("raw"));
+    if (btnPct) btnPct.addEventListener("click", () => switchMetricMode("percentage"));
+
+    const btnSimB = document.getElementById("btn-baseline-simulate");
+    const btnSimA = document.getElementById("btn-agent-simulate");
+    if (btnSimB) btnSimB.addEventListener("click", startBaselineSimulation);
+    if (btnSimA) btnSimA.addEventListener("click", startAgenticSimulation);
+
+    const closeBtn = document.getElementById("vis-overlay-close");
+    if (closeBtn) closeBtn.addEventListener("click", closeVisOverlay);
 
     const sectorSelect = document.getElementById("select-dataset-sector");
     if (sectorSelect) {
@@ -87,15 +141,13 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    renderExplorerList();
-    renderMatrixTable();
-    renderDatasetTable();
-    initBarChart();
-    initRadarChart();
-    updateROICalculator();
-
-    requestAnimationFrame(animationLoop);
-});
+    const promptIpt = document.getElementById("ipt-agent-prompt");
+    if (promptIpt) {
+        promptIpt.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") startAgenticSimulation();
+        });
+    }
+}
 
 function switchTab(tabId) {
     activeTab = tabId;
@@ -121,14 +173,16 @@ function switchTab(tabId) {
 
 function switchMetricMode(mode) {
     metricDisplayMode = mode;
-    document.getElementById("btn-metric-raw").classList.remove("active");
-    document.getElementById("btn-metric-pct").classList.remove("active");
+    const btnRaw = document.getElementById("btn-metric-raw");
+    const btnPct = document.getElementById("btn-metric-pct");
+    if (btnRaw) btnRaw.classList.remove("active");
+    if (btnPct) btnPct.classList.remove("active");
 
     if (mode === "raw") {
-        document.getElementById("btn-metric-raw").classList.add("active");
+        if (btnRaw) btnRaw.classList.add("active");
         document.getElementById("bar-chart-mode-label").textContent = "Raw Values";
     } else {
-        document.getElementById("btn-metric-pct").classList.add("active");
+        if (btnPct) btnPct.classList.add("active");
         document.getElementById("bar-chart-mode-label").textContent = "% Improvement Gain";
     }
 
@@ -136,384 +190,456 @@ function switchMetricMode(mode) {
 }
 
 // ==========================================
-// 4. STRESS-TEST SCENARIO PRESETS & DES ENGINE
+// 3. STRESS-TEST PRESETS & DES HANDLERS
 // ==========================================
 function applyScenarioPreset(presetType, mode) {
-    if (presetType === 'surge') {
-        if (mode === 'b') {
-            document.getElementById("sim-b-lambda").value = 30;
-            document.getElementById("sim-b-mu").value = 4;
-            document.getElementById("sim-b-sigma").value = 18;
+    try {
+        if (presetType === 'surge') {
+            if (mode === 'b') {
+                document.getElementById("sim-b-lambda").value = 30;
+                document.getElementById("sim-b-mu").value = 4;
+                document.getElementById("sim-b-sigma").value = 18;
+                updateDESLabel('b');
+                runDES('b');
+            } else {
+                document.getElementById("sim-a-lambda").value = 55;
+                document.getElementById("sim-a-nodes").value = 10;
+                document.getElementById("sim-a-sigma").value = 4;
+                updateDESLabel('a');
+                runDES('a');
+            }
+        } else if (presetType === 'lockdown') {
+            document.getElementById("sim-b-lambda").value = 22;
+            document.getElementById("sim-b-mu").value = 5;
+            document.getElementById("sim-b-sigma").value = 22;
             updateDESLabel('b');
             runDES('b');
-        } else {
-            document.getElementById("sim-a-lambda").value = 55;
-            document.getElementById("sim-a-nodes").value = 10;
-            document.getElementById("sim-a-sigma").value = 4;
+        } else if (presetType === 'optimal') {
+            document.getElementById("sim-a-lambda").value = 40;
+            document.getElementById("sim-a-nodes").value = 8;
+            document.getElementById("sim-a-sigma").value = 2;
             updateDESLabel('a');
             runDES('a');
+        } else if (presetType === 'legacy') {
+            document.getElementById("sim-b-lambda").value = 25;
+            document.getElementById("sim-b-mu").value = 3;
+            document.getElementById("sim-b-sigma").value = 15;
+            updateDESLabel('b');
+            runDES('b');
         }
-    } else if (presetType === 'lockdown') {
-        document.getElementById("sim-b-lambda").value = 22;
-        document.getElementById("sim-b-mu").value = 5;
-        document.getElementById("sim-b-sigma").value = 22;
-        updateDESLabel('b');
-        runDES('b');
-    } else if (presetType === 'optimal') {
-        document.getElementById("sim-a-lambda").value = 40;
-        document.getElementById("sim-a-nodes").value = 8;
-        document.getElementById("sim-a-sigma").value = 2;
-        updateDESLabel('a');
-        runDES('a');
-    } else if (presetType === 'legacy') {
-        document.getElementById("sim-b-lambda").value = 25;
-        document.getElementById("sim-b-mu").value = 3;
-        document.getElementById("sim-b-sigma").value = 15;
-        updateDESLabel('b');
-        runDES('b');
+    } catch (e) {
+        console.error("Error applying scenario preset:", e);
     }
 }
 
 function updateDESLabel(mode) {
-    if (mode === 'b') {
-        let lambda = document.getElementById("sim-b-lambda").value;
-        let mu = document.getElementById("sim-b-mu").value;
-        let sigma = document.getElementById("sim-b-sigma").value;
-        let steps = document.getElementById("sim-b-steps").value;
+    try {
+        if (mode === 'b') {
+            let lambda = document.getElementById("sim-b-lambda").value;
+            let mu = document.getElementById("sim-b-mu").value;
+            let sigma = document.getElementById("sim-b-sigma").value;
+            let steps = document.getElementById("sim-b-steps").value;
 
-        document.getElementById("lbl-b-lambda").textContent = `${lambda} req/hr`;
-        document.getElementById("lbl-b-mu").textContent = `${mu} req/hr/eng`;
-        document.getElementById("lbl-b-sigma").textContent = `${sigma}% defect`;
-        document.getElementById("lbl-b-steps").textContent = `${steps} Steps`;
-    } else {
-        let lambda = document.getElementById("sim-a-lambda").value;
-        let nodes = document.getElementById("sim-a-nodes").value;
-        let sigma = document.getElementById("sim-a-sigma").value;
-        let steps = document.getElementById("sim-a-steps").value;
+            document.getElementById("lbl-b-lambda").textContent = `${lambda} req/hr`;
+            document.getElementById("lbl-b-mu").textContent = `${mu} req/hr/eng`;
+            document.getElementById("lbl-b-sigma").textContent = `${sigma}% defect`;
+            document.getElementById("lbl-b-steps").textContent = `${steps} Steps`;
+        } else {
+            let lambda = document.getElementById("sim-a-lambda").value;
+            let nodes = document.getElementById("sim-a-nodes").value;
+            let sigma = document.getElementById("sim-a-sigma").value;
+            let steps = document.getElementById("sim-a-steps").value;
 
-        document.getElementById("lbl-a-lambda").textContent = `${lambda} req/hr`;
-        document.getElementById("lbl-a-nodes").textContent = `${nodes} Nodes`;
-        document.getElementById("lbl-a-sigma").textContent = `${sigma}% exceptions`;
-        document.getElementById("lbl-a-steps").textContent = `${steps} Steps`;
+            document.getElementById("lbl-a-lambda").textContent = `${lambda} req/hr`;
+            document.getElementById("lbl-a-nodes").textContent = `${nodes} Nodes`;
+            document.getElementById("lbl-a-sigma").textContent = `${sigma}% exceptions`;
+            document.getElementById("lbl-a-steps").textContent = `${steps} Steps`;
+        }
+    } catch (e) {
+        console.error("Error updating DES labels:", e);
     }
 }
 
 function runDES(mode) {
-    if (mode === 'b') {
-        let lambda = parseFloat(document.getElementById("sim-b-lambda").value);
-        let mu = parseFloat(document.getElementById("sim-b-mu").value);
-        let sigma = parseFloat(document.getElementById("sim-b-sigma").value) / 100.0;
-        let steps = parseInt(document.getElementById("sim-b-steps").value);
+    try {
+        if (mode === 'b') {
+            let lambda = parseFloat(document.getElementById("sim-b-lambda").value);
+            let mu = parseFloat(document.getElementById("sim-b-mu").value);
+            let steps = parseInt(document.getElementById("sim-b-steps").value);
 
-        let rho = lambda / (mu * 3.0);
-        let simulatedWq = rho >= 0.95 ? (14.2 + (rho * 4.5)) : Math.max(8.5, (14.2 * rho));
-        let simulatedBacklog = Math.round(18 * rho);
+            let rho = lambda / (mu * 3.0);
+            let simulatedWq = rho >= 0.95 ? (14.2 + (rho * 4.5)) : Math.max(8.5, (14.2 * rho));
+            let simulatedBacklog = Math.round(18 * rho);
 
-        document.getElementById("txt-des-summary-b").textContent = `Simulated Wq: ${simulatedWq.toFixed(1)} Hours | Backlog: ${simulatedBacklog} req`;
-        document.getElementById("metric-b-wq").textContent = `${simulatedWq.toFixed(1)} Hours`;
-        document.getElementById("metric-b-lq").textContent = `${simulatedBacklog} Requests`;
+            document.getElementById("txt-des-summary-b").textContent = `Simulated Wq: ${simulatedWq.toFixed(1)} Hours | Backlog: ${simulatedBacklog} req`;
+            document.getElementById("metric-b-wq").textContent = `${simulatedWq.toFixed(1)} Hours`;
+            document.getElementById("metric-b-lq").textContent = `${simulatedBacklog} Requests`;
 
-        alert(`Discrete-Event Simulation Completed (${steps} steps)! Simulated Mean Wq: ${simulatedWq.toFixed(1)} Hours.`);
-    } else {
-        let lambda = parseFloat(document.getElementById("sim-a-lambda").value);
-        let nodes = parseFloat(document.getElementById("sim-a-nodes").value);
-        let sigma = parseFloat(document.getElementById("sim-a-sigma").value) / 100.0;
-        let steps = parseInt(document.getElementById("sim-a-steps").value);
+            alert(`Discrete-Event Simulation Completed (${steps} steps)! Simulated Mean Wq: ${simulatedWq.toFixed(1)} Hours.`);
+        } else {
+            let lambda = parseFloat(document.getElementById("sim-a-lambda").value);
+            let nodes = parseFloat(document.getElementById("sim-a-nodes").value);
+            let sigma = parseFloat(document.getElementById("sim-a-sigma").value) / 100.0;
+            let steps = parseInt(document.getElementById("sim-a-steps").value);
 
-        let mu = 15.0;
-        let capacity = nodes * mu;
-        let simulatedWqMin = Math.max(25.0, 48.5 * (lambda / capacity));
-        let simulatedSTP = Math.min(88.0, Math.max(68.0, (1.0 - sigma) * 85.0));
+            let mu = 15.0;
+            let capacity = nodes * mu;
+            let simulatedWqMin = Math.max(25.0, 48.5 * (lambda / capacity));
+            let simulatedSTP = Math.min(88.0, Math.max(68.0, (1.0 - sigma) * 85.0));
 
-        document.getElementById("txt-des-summary-a").textContent = `Simulated Wq: ${simulatedWqMin.toFixed(1)} Mins | STP: ${simulatedSTP.toFixed(1)}% | Active Nodes: ${nodes}`;
-        document.getElementById("metric-a-wq").textContent = `${simulatedWqMin.toFixed(1)} Mins`;
-        document.getElementById("metric-a-stp").textContent = `${simulatedSTP.toFixed(1)}%`;
+            document.getElementById("txt-des-summary-a").textContent = `Simulated Wq: ${simulatedWqMin.toFixed(1)} Mins | STP: ${simulatedSTP.toFixed(1)}% | Active Nodes: ${nodes}`;
+            document.getElementById("metric-a-wq").textContent = `${simulatedWqMin.toFixed(1)} Mins`;
+            document.getElementById("metric-a-stp").textContent = `${simulatedSTP.toFixed(1)}%`;
 
-        alert(`Discrete-Event Simulation Completed (${steps} steps)! Simulated Mean Wq: ${simulatedWqMin.toFixed(1)} Mins.`);
+            alert(`Discrete-Event Simulation Completed (${steps} steps)! Simulated Mean Wq: ${simulatedWqMin.toFixed(1)} Mins.`);
+        }
+    } catch (e) {
+        console.error("Error running DES simulation:", e);
     }
 }
 
 // ==========================================
-// 5. INTERACTIVE FINANCIAL ROI CALCULATOR
+// 4. INTERACTIVE FINANCIAL ROI CALCULATOR
 // ==========================================
 function updateROICalculator() {
-    let devs = parseInt(document.getElementById("roi-devs").value);
-    let rate = parseInt(document.getElementById("roi-rate").value);
-    let cloud = parseInt(document.getElementById("roi-cloud").value);
+    try {
+        let devs = parseInt(document.getElementById("roi-devs").value);
+        let rate = parseInt(document.getElementById("roi-rate").value);
+        let cloud = parseInt(document.getElementById("roi-cloud").value);
 
-    document.getElementById("lbl-roi-devs").textContent = `${devs} Developers`;
-    document.getElementById("lbl-roi-rate").textContent = `$${rate} / hour`;
-    document.getElementById("lbl-roi-cloud").textContent = `$${cloud.toLocaleString()} / month`;
+        document.getElementById("lbl-roi-devs").textContent = `${devs} Developers`;
+        document.getElementById("lbl-roi-rate").textContent = `$${rate} / hour`;
+        document.getElementById("lbl-roi-cloud").textContent = `$${cloud.toLocaleString()} / month`;
 
-    // 165.6 hours saved per developer per year (from 14.2h -> 48.5m wait time drops across 12 monthly cycles)
-    let hoursSaved = Math.round(devs * 165.6);
-    let laborSavedDollars = Math.round(hoursSaved * rate);
-    // 22.8% net cloud waste reclaimed per year
-    let cloudSavedDollars = Math.round((cloud * 12) * 0.228);
-    let totalSavings = laborSavedDollars + cloudSavedDollars;
+        let hoursSaved = Math.round(devs * 165.6);
+        let laborSavedDollars = Math.round(hoursSaved * rate);
+        let cloudSavedDollars = Math.round((cloud * 12) * 0.228);
+        let totalSavings = laborSavedDollars + cloudSavedDollars;
 
-    document.getElementById("roi-hours-saved").textContent = `${hoursSaved.toLocaleString()} Hours`;
-    document.getElementById("roi-labor-saved").textContent = `$${laborSavedDollars.toLocaleString()}`;
-    document.getElementById("roi-cloud-saved").textContent = `$${cloudSavedDollars.toLocaleString()}`;
-    document.getElementById("roi-total-saved").textContent = `$${totalSavings.toLocaleString()} / yr`;
+        document.getElementById("roi-hours-saved").textContent = `${hoursSaved.toLocaleString()} Hours`;
+        document.getElementById("roi-labor-saved").textContent = `$${laborSavedDollars.toLocaleString()}`;
+        document.getElementById("roi-cloud-saved").textContent = `$${cloudSavedDollars.toLocaleString()}`;
+        document.getElementById("roi-total-saved").textContent = `$${totalSavings.toLocaleString()} / yr`;
+    } catch (e) {
+        console.error("Error updating ROI calculator:", e);
+    }
 }
 
 // ==========================================
-// 6. 60FPS HTML5 CANVAS PARTICLE ANIMATION LOOP
+// 5. 60FPS HTML5 CANVAS PARTICLE ANIMATION LOOP
 // ==========================================
 function animationLoop() {
     desFrameCount++;
 
-    // 1. Render Baseline Particle Queuing Canvas
-    const canvasB = document.getElementById("canvas-des-particle-b");
-    if (canvasB && activeTab === "baseline") {
-        const ctx = canvasB.getContext("2d");
-        ctx.clearRect(0, 0, canvasB.width, canvasB.height);
+    try {
+        // 1. Render Baseline Particle Canvas
+        const canvasB = document.getElementById("canvas-des-particle-b");
+        if (canvasB && activeTab === "baseline") {
+            // Synchronize pixel dimensions with element box
+            if (canvasB.parentElement) {
+                let rect = canvasB.parentElement.getBoundingClientRect();
+                if (canvasB.width !== Math.floor(rect.width)) canvasB.width = Math.floor(rect.width);
+                if (canvasB.height !== 160) canvasB.height = 160;
+            }
 
-        // Draw Queue Lane Boundaries
-        ctx.strokeStyle = "rgba(244, 63, 94, 0.3)";
-        ctx.lineWidth = 1.5;
-        ctx.setLineDash([4, 4]);
-        ctx.strokeRect(50, 45, 420, 70);
-        ctx.setLineDash([]);
+            const ctx = canvasB.getContext("2d");
+            if (ctx) {
+                ctx.clearRect(0, 0, canvasB.width, canvasB.height);
 
-        ctx.fillStyle = "#94a3b8";
-        ctx.font = "bold 8.5px Outfit";
-        ctx.fillText("INCOMING TICKET QUEUE (Lq Backlog)", 60, 40);
+                // Queue Lane Box
+                ctx.strokeStyle = "rgba(244, 63, 94, 0.35)";
+                ctx.lineWidth = 1.5;
+                ctx.setLineDash([4, 4]);
+                ctx.strokeRect(40, 35, canvasB.width - 180, 80);
+                ctx.setLineDash([]);
 
-        // Draw Single Human Server Node
-        ctx.fillStyle = desFrameCount % 60 < 30 ? "rgba(244, 63, 94, 0.8)" : "rgba(245, 158, 11, 0.8)";
-        ctx.strokeStyle = "#f43f5e";
-        ctx.beginPath();
-        ctx.arc(580, 80, 26, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.stroke();
+                ctx.fillStyle = "#94a3b8";
+                ctx.font = "bold 9px Outfit";
+                ctx.fillText("INCOMING TICKET QUEUE (Lq Backlog)", 50, 30);
 
-        ctx.fillStyle = "#ffffff";
-        ctx.font = "bold 8px Outfit";
-        ctx.textAlign = "center";
-        ctx.fillText("👨‍💻 HUMAN", 580, 78);
-        ctx.fillText("OVERLOAD", 580, 88);
-        ctx.textAlign = "left";
+                // Human Operator Server Node
+                let nodeX = canvasB.width - 80;
+                ctx.fillStyle = desFrameCount % 60 < 30 ? "rgba(244, 63, 94, 0.85)" : "rgba(245, 158, 11, 0.85)";
+                ctx.strokeStyle = "#f43f5e";
+                ctx.beginPath();
+                ctx.arc(nodeX, 75, 26, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
 
-        // Spawn red request particles
-        if (desFrameCount % 40 === 0 && desParticlesB.length < 16) {
-            desParticlesB.push({
-                x: 10,
-                y: 80 + (Math.random() * 20 - 10),
-                speed: 1.5,
-                balking: Math.random() < 0.25,
-                balkTimer: 0
-            });
-        }
+                ctx.fillStyle = "#ffffff";
+                ctx.font = "bold 8.5px Outfit";
+                ctx.textAlign = "center";
+                ctx.fillText("👨‍💻 HUMAN", nodeX, 73);
+                ctx.fillText("OVERLOAD", nodeX, 83);
+                ctx.textAlign = "left";
 
-        desParticlesB.forEach((p, idx) => {
-            let targetX = 450 - (idx * 24);
-            if (p.x < targetX) p.x += p.speed;
-
-            if (p.balking && p.x >= targetX) {
-                p.y -= 1.2;
-                p.balkTimer++;
-
-                ctx.fillStyle = "#ef4444";
-                ctx.font = "10px sans-serif";
-                ctx.fillText("😡 RENEGED", p.x - 15, p.y - 10);
-
-                if (p.balkTimer > 50) {
-                    desParticlesB.splice(idx, 1);
-                    return;
+                // Spawn Request Particles
+                if (desFrameCount % 35 === 0 && desParticlesB.length < 18) {
+                    desParticlesB.push({
+                        x: 10,
+                        y: 75 + (Math.random() * 24 - 12),
+                        speed: 1.8,
+                        balking: Math.random() < 0.28,
+                        balkTimer: 0
+                    });
                 }
+
+                desParticlesB.forEach((p, idx) => {
+                    let targetX = (nodeX - 50) - (idx * 22);
+                    if (p.x < targetX) p.x += p.speed;
+
+                    if (p.balking && p.x >= targetX) {
+                        p.y -= 1.2;
+                        p.balkTimer++;
+
+                        ctx.fillStyle = "#ef4444";
+                        ctx.font = "bold 9px sans-serif";
+                        ctx.fillText("😡 RENEGED", p.x - 15, p.y - 8);
+
+                        if (p.balkTimer > 45) {
+                            desParticlesB.splice(idx, 1);
+                            return;
+                        }
+                    }
+
+                    ctx.fillStyle = p.balking ? "#f97316" : "#f43f5e";
+                    ctx.shadowColor = "#f43f5e";
+                    ctx.shadowBlur = 6;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, 6, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                });
             }
-
-            ctx.fillStyle = p.balking ? "#f97316" : "#f43f5e";
-            ctx.shadowColor = "#f43f5e";
-            ctx.shadowBlur = 6;
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, 6, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.shadowBlur = 0;
-        });
-    }
-
-    // 2. Render Agentic Particle Queuing Canvas
-    const canvasA = document.getElementById("canvas-des-particle-a");
-    if (canvasA && activeTab === "agentic") {
-        const ctx = canvasA.getContext("2d");
-        ctx.clearRect(0, 0, canvasA.width, canvasA.height);
-
-        // Draw 4 Agent Pipeline Worker Nodes
-        const nodes = [
-            { x: 120, label: "🧠 Intent" },
-            { x: 280, label: "🛡️ Policy" },
-            { x: 440, label: "⚙️ Cloudify" },
-            { x: 600, label: "🏗️ Terraform" }
-        ];
-
-        nodes.forEach(n => {
-            ctx.fillStyle = "rgba(16, 185, 129, 0.15)";
-            ctx.strokeStyle = "#10b981";
-            ctx.lineWidth = 1.5;
-            ctx.beginPath();
-            ctx.arc(n.x, 80, 22, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.stroke();
-
-            ctx.fillStyle = "#34d399";
-            ctx.font = "bold 8px Outfit";
-            ctx.textAlign = "center";
-            ctx.fillText(n.label, n.x, 83);
-            ctx.textAlign = "left";
-        });
-
-        // Connect nodes with glowing green lines
-        ctx.strokeStyle = "rgba(16, 185, 129, 0.4)";
-        ctx.lineWidth = 2;
-        ctx.setLineDash([4, 4]);
-        ctx.beginPath();
-        ctx.moveTo(30, 80);
-        ctx.lineTo(670, 80);
-        ctx.stroke();
-        ctx.setLineDash([]);
-
-        // Spawn emerald particles
-        if (desFrameCount % 20 === 0 && desParticlesA.length < 12) {
-            desParticlesA.push({ x: 30, y: 80, speed: 4.5 });
         }
 
-        desParticlesA.forEach((p, idx) => {
-            p.x += p.speed;
-            if (p.x > 670) {
-                desParticlesA.splice(idx, 1);
-                return;
+        // 2. Render Agentic Particle Canvas
+        const canvasA = document.getElementById("canvas-des-particle-a");
+        if (canvasA && activeTab === "agentic") {
+            if (canvasA.parentElement) {
+                let rect = canvasA.parentElement.getBoundingClientRect();
+                if (canvasA.width !== Math.floor(rect.width)) canvasA.width = Math.floor(rect.width);
+                if (canvasA.height !== 160) canvasA.height = 160;
             }
 
-            ctx.fillStyle = "#10b981";
-            ctx.shadowColor = "#10b981";
-            ctx.shadowBlur = 8;
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.shadowBlur = 0;
-        });
+            const ctx = canvasA.getContext("2d");
+            if (ctx) {
+                ctx.clearRect(0, 0, canvasA.width, canvasA.height);
+
+                let w = canvasA.width;
+                let step = w / 5;
+                const nodes = [
+                    { x: step * 1, label: "🧠 Intent" },
+                    { x: step * 2, label: "🛡️ Policy" },
+                    { x: step * 3, label: "⚙️ Cloudify" },
+                    { x: step * 4, label: "🏗️ Terraform" }
+                ];
+
+                // Draw Connecting Line
+                ctx.strokeStyle = "rgba(16, 185, 129, 0.4)";
+                ctx.lineWidth = 2;
+                ctx.setLineDash([4, 4]);
+                ctx.beginPath();
+                ctx.moveTo(30, 75);
+                ctx.lineTo(w - 30, 75);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                nodes.forEach(n => {
+                    ctx.fillStyle = "rgba(16, 185, 129, 0.15)";
+                    ctx.strokeStyle = "#10b981";
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    ctx.arc(n.x, 75, 22, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+
+                    ctx.fillStyle = "#34d399";
+                    ctx.font = "bold 8.5px Outfit";
+                    ctx.textAlign = "center";
+                    ctx.fillText(n.label, n.x, 78);
+                    ctx.textAlign = "left";
+                });
+
+                // Spawn Prompt Particles
+                if (desFrameCount % 18 === 0 && desParticlesA.length < 14) {
+                    desParticlesA.push({ x: 30, y: 75, speed: 5.0 });
+                }
+
+                desParticlesA.forEach((p, idx) => {
+                    p.x += p.speed;
+                    if (p.x > w - 30) {
+                        desParticlesA.splice(idx, 1);
+                        return;
+                    }
+
+                    ctx.fillStyle = "#10b981";
+                    ctx.shadowColor = "#10b981";
+                    ctx.shadowBlur = 8;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                });
+            }
+        }
+    } catch (e) {
+        console.error("Error in animation loop:", e);
     }
 
     requestAnimationFrame(animationLoop);
 }
 
 // ==========================================
-// 7. DATASET TABLE & MATRIX RENDERERS
+// 6. RENDERERS & DATA HANDLERS
 // ==========================================
 function renderDatasetTable() {
-    const tbody = document.getElementById("table-dataset-50-tbody");
-    if (!tbody) return;
-    tbody.innerHTML = "";
+    try {
+        const tbody = document.getElementById("table-dataset-50-tbody");
+        if (!tbody) return;
+        tbody.innerHTML = "";
 
-    companies50Dataset.forEach(comp => {
-        if (datasetSectorFilter !== "all" && comp.sector !== datasetSectorFilter) return;
+        companies50Dataset.forEach(comp => {
+            if (datasetSectorFilter !== "all" && comp.sector !== datasetSectorFilter) return;
 
-        const tr = document.createElement("tr");
-        tr.className = "hover:bg-slate-50 transition-colors border-b border-slate-200";
-        tr.innerHTML = `
-            <td class="py-2.5 px-3 font-bold text-slate-500 font-mono text-[9px]">${comp.id}</td>
-            <td class="py-2.5 px-3 font-bold text-slate-900">${comp.name}</td>
-            <td class="py-2.5 px-3 text-slate-600"><span class="px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-[8.5px] font-semibold">${comp.sector}</span></td>
-            <td class="py-2.5 px-3 font-bold text-rose-700 font-mono">${comp.wqBase}h</td>
-            <td class="py-2.5 px-3 font-bold text-emerald-700 font-mono">${comp.wqAgent}m</td>
-            <td class="py-2.5 px-3 font-bold text-rose-700 font-mono">${comp.stpBase}%</td>
-            <td class="py-2.5 px-3 font-bold text-emerald-700 font-mono">${comp.stpAgent}%</td>
-            <td class="py-2.5 px-3 font-bold text-rose-700 font-mono">${comp.dpmoBase.toLocaleString()}</td>
-            <td class="py-2.5 px-3 font-bold text-emerald-700 font-mono">${comp.dpmoAgent.toLocaleString()}</td>
-            <td class="py-2.5 px-3 font-bold text-indigo-700 font-mono">${comp.deaAgent.toFixed(2)}</td>
-        `;
-        tbody.appendChild(tr);
-    });
+            const tr = document.createElement("tr");
+            tr.className = "hover:bg-slate-50 transition-colors border-b border-slate-200";
+            tr.innerHTML = `
+                <td class="py-2.5 px-3 font-bold text-slate-500 font-mono text-[9px]">${comp.id}</td>
+                <td class="py-2.5 px-3 font-bold text-slate-900">${comp.name}</td>
+                <td class="py-2.5 px-3 text-slate-600"><span class="px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-[8.5px] font-semibold">${comp.sector}</span></td>
+                <td class="py-2.5 px-3 font-bold text-rose-700 font-mono">${comp.wqBase}h</td>
+                <td class="py-2.5 px-3 font-bold text-emerald-700 font-mono">${comp.wqAgent}m</td>
+                <td class="py-2.5 px-3 font-bold text-rose-700 font-mono">${comp.stpBase}%</td>
+                <td class="py-2.5 px-3 font-bold text-emerald-700 font-mono">${comp.stpAgent}%</td>
+                <td class="py-2.5 px-3 font-bold text-rose-700 font-mono">${comp.dpmoBase.toLocaleString()}</td>
+                <td class="py-2.5 px-3 font-bold text-emerald-700 font-mono">${comp.dpmoAgent.toLocaleString()}</td>
+                <td class="py-2.5 px-3 font-bold text-indigo-700 font-mono">${comp.deaAgent.toFixed(2)}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    } catch (e) {
+        console.error("Error rendering dataset table:", e);
+    }
 }
 
 function downloadCSVDataset() {
-    let csvContent = "data:text/csv;charset=utf-8,";
-    csvContent += "Company_ID,Company_Name,Industry_Sector,Monthly_Deployments,Wq_Baseline_Hrs,Wq_Agentic_Min,Lq_Baseline_Req,Lq_Agentic_Req,DEA_Baseline_Theta,DEA_Agentic_Theta,STP_Baseline_Pct,STP_Agentic_Pct,DPMO_Baseline,DPMO_Agentic,MTTR_Baseline_Min,MTTR_Agentic_Min,SERVQUAL_Baseline_Q,SERVQUAL_Agentic_Q,Waste_Baseline_Pct,Waste_Agentic_Pct\n";
+    try {
+        let csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += "Company_ID,Company_Name,Industry_Sector,Monthly_Deployments,Wq_Baseline_Hrs,Wq_Agentic_Min,Lq_Baseline_Req,Lq_Agentic_Req,DEA_Baseline_Theta,DEA_Agentic_Theta,STP_Baseline_Pct,STP_Agentic_Pct,DPMO_Baseline,DPMO_Agentic,MTTR_Baseline_Min,MTTR_Agentic_Min,SERVQUAL_Baseline_Q,SERVQUAL_Agentic_Q,Waste_Baseline_Pct,Waste_Agentic_Pct\n";
 
-    companies50Dataset.forEach(c => {
-        let row = [
-            c.id, `"${c.name}"`, `"${c.sector}"`, c.reqs, c.wqBase, c.wqAgent, c.lqBase, c.lqAgent, c.deaBase, c.deaAgent, c.stpBase, c.stpAgent, c.dpmoBase, c.dpmoAgent, c.mttrBase, c.mttrAgent, c.qBase, c.qAgent, c.wasteBase, c.wasteAgent
-        ].join(",");
-        csvContent += row + "\n";
-    });
+        companies50Dataset.forEach(c => {
+            let row = [
+                c.id, `"${c.name}"`, `"${c.sector}"`, c.reqs, c.wqBase, c.wqAgent, c.lqBase, c.lqAgent, c.deaBase, c.deaAgent, c.stpBase, c.stpAgent, c.dpmoBase, c.dpmoAgent, c.mttrBase, c.mttrAgent, c.qBase, c.qAgent, c.wasteBase, c.wasteAgent
+            ].join(",");
+            csvContent += row + "\n";
+        });
 
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "som_benchmark_dataset_50_companies.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "som_benchmark_dataset_50_companies.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } catch (e) {
+        console.error("Error downloading CSV dataset:", e);
+    }
 }
 
 function renderExplorerList() {
-    const listContainer = document.getElementById("som-explorer-list");
-    listContainer.innerHTML = "";
+    try {
+        const listContainer = document.getElementById("som-explorer-list");
+        if (!listContainer) return;
+        listContainer.innerHTML = "";
 
-    const uniqueModules = [...new Set(somDatabase.map(item => item.module))];
+        const uniqueModules = [...new Set(somDatabase.map(item => item.module))];
 
-    uniqueModules.forEach(modName => {
-        const itemEl = document.createElement("div");
-        itemEl.className = "som-explorer-card p-3 rounded-2xl text-xs font-semibold text-slate-700 hover:text-slate-900 flex items-center justify-between cursor-pointer transition-all";
-        
-        let iconHtml = "<i class='fa-solid fa-bezier-curve text-indigo-600'></i>";
-        if (modName.includes("Encounter")) iconHtml = "<i class='fa-solid fa-people-arrows text-cyan-600'></i>";
-        if (modName.includes("Quality")) iconHtml = "<i class='fa-solid fa-circle-check text-emerald-600'></i>";
-        if (modName.includes("Productivity")) iconHtml = "<i class='fa-solid fa-chart-line text-indigo-600'></i>";
+        uniqueModules.forEach(modName => {
+            const itemEl = document.createElement("div");
+            itemEl.className = "som-explorer-card p-3 rounded-2xl text-xs font-semibold text-slate-700 hover:text-slate-900 flex items-center justify-between cursor-pointer transition-all";
+            
+            let iconHtml = "<i class='fa-solid fa-bezier-curve text-indigo-600'></i>";
+            if (modName.includes("Encounter")) iconHtml = "<i class='fa-solid fa-people-arrows text-cyan-600'></i>";
+            if (modName.includes("Quality")) iconHtml = "<i class='fa-solid fa-circle-check text-emerald-600'></i>";
+            if (modName.includes("Productivity")) iconHtml = "<i class='fa-solid fa-chart-line text-indigo-600'></i>";
 
-        itemEl.innerHTML = `
-            <div class="flex items-center gap-2 pointer-events-none">
-                ${iconHtml}
-                <span>${modName}</span>
-            </div>
-            <i class="fa-solid fa-chevron-right text-[10px] text-slate-400 pointer-events-none"></i>
-        `;
-        
-        itemEl.addEventListener("click", () => openSOMDrawer(modName));
-        listContainer.appendChild(itemEl);
-    });
+            itemEl.innerHTML = `
+                <div class="flex items-center gap-2 pointer-events-none">
+                    ${iconHtml}
+                    <span>${modName}</span>
+                </div>
+                <i class="fa-solid fa-chevron-right text-[10px] text-slate-400 pointer-events-none"></i>
+            `;
+            
+            itemEl.addEventListener("click", () => openSOMDrawer(modName));
+            listContainer.appendChild(itemEl);
+        });
+    } catch (e) {
+        console.error("Error rendering explorer list:", e);
+    }
 }
 
 function openSOMDrawer(modName) {
-    const drawer = document.getElementById("som-drawer");
-    document.getElementById("drawer-title").textContent = modName;
-    document.getElementById("drawer-category").textContent = "SOM Evaluation Context";
-    drawer.classList.add("open-drawer");
+    try {
+        const drawer = document.getElementById("som-drawer");
+        document.getElementById("drawer-title").textContent = modName;
+        document.getElementById("drawer-category").textContent = "SOM Evaluation Context";
+        if (drawer) drawer.classList.add("open-drawer");
+    } catch (e) {
+        console.error("Error opening SOM drawer:", e);
+    }
 }
 
 function closeSOMDrawer() {
-    document.getElementById("som-drawer").classList.remove("open-drawer");
+    try {
+        const drawer = document.getElementById("som-drawer");
+        if (drawer) drawer.classList.remove("open-drawer");
+    } catch (e) {
+        console.error("Error closing SOM drawer:", e);
+    }
 }
 
 function openVisOverlay(type, isAgentic) {
-    overlayVisType = type;
-    overlayVisAgentic = isAgentic;
-    overlayOpen = true;
+    try {
+        overlayVisType = type;
+        overlayVisAgentic = isAgentic;
+        overlayOpen = true;
 
-    const modal = document.getElementById("vis-overlay-modal");
-    modal.classList.remove("opacity-0", "pointer-events-none");
-    renderOverlayFrame();
+        const modal = document.getElementById("vis-overlay-modal");
+        if (modal) modal.classList.remove("opacity-0", "pointer-events-none");
+        renderOverlayFrame();
+    } catch (e) {
+        console.error("Error opening vis overlay:", e);
+    }
 }
 
 function closeVisOverlay() {
-    overlayOpen = false;
-    document.getElementById("vis-overlay-modal").classList.add("opacity-0", "pointer-events-none");
+    try {
+        overlayOpen = false;
+        const modal = document.getElementById("vis-overlay-modal");
+        if (modal) modal.classList.add("opacity-0", "pointer-events-none");
+    } catch (e) {
+        console.error("Error closing vis overlay:", e);
+    }
 }
 
 function renderOverlayFrame() {
     if (!overlayOpen) return;
 
-    const canvas = document.getElementById("vis-overlay-canvas");
-    if (canvas) {
-        const ctx = canvas.getContext("2d");
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        ctx.fillStyle = "#94a3b8";
-        ctx.font = "bold 12px Outfit";
-        ctx.fillText(overlayVisAgentic ? "AGENTIC EAAS SERVICE BLUEPRINT & DEA FRONTIER (θ = 0.89)" : "BASELINE SERVICE BLUEPRINT & DEA FRONTIER (θ = 0.62)", 40, 40);
+    try {
+        const canvas = document.getElementById("vis-overlay-canvas");
+        if (canvas) {
+            const ctx = canvas.getContext("2d");
+            if (ctx) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = "#94a3b8";
+                ctx.font = "bold 12px Outfit";
+                ctx.fillText(overlayVisAgentic ? "AGENTIC EAAS SERVICE BLUEPRINT & DEA FRONTIER (θ = 0.89)" : "BASELINE SERVICE BLUEPRINT & DEA FRONTIER (θ = 0.62)", 40, 40);
+            }
+        }
+    } catch (e) {
+        console.error("Error rendering overlay frame:", e);
     }
 }
 
@@ -524,12 +650,14 @@ function startBaselineSimulation() {
 }
 
 function selectPromptPreset(text) {
-    document.getElementById("ipt-agent-prompt").value = text;
+    const ipt = document.getElementById("ipt-agent-prompt");
+    if (ipt) ipt.value = text;
 }
 
 function startAgenticSimulation() {
     if (agenticSimActive) return;
-    let promptVal = document.getElementById("ipt-agent-prompt").value.trim();
+    const ipt = document.getElementById("ipt-agent-prompt");
+    let promptVal = ipt ? ipt.value.trim() : "";
     if (!promptVal) promptVal = "Provision a downscaled staging VM for testing";
 
     agenticSimActive = true;
@@ -538,60 +666,102 @@ function startAgenticSimulation() {
 
 function logMessage(sub, msg) {
     const consoleEl = document.getElementById("div-agent-console");
-    consoleEl.innerHTML += `<div class="mb-1"><span class="text-cyan-400 font-bold">[${sub}]</span> ${msg}</div>`;
-    consoleEl.scrollTop = consoleEl.scrollHeight;
+    if (consoleEl) {
+        consoleEl.innerHTML += `<div class="mb-1"><span class="text-cyan-400 font-bold">[${sub}]</span> ${msg}</div>`;
+        consoleEl.scrollTop = consoleEl.scrollHeight;
+    }
 }
 
 function renderMatrixTable() {
-    const tbody = document.getElementById("matrix-tbody");
-    if (!tbody) return;
-    tbody.innerHTML = "";
+    try {
+        const tbody = document.getElementById("matrix-tbody");
+        if (!tbody) return;
+        tbody.innerHTML = "";
 
-    somQuantitativeMetrics.forEach(item => {
-        const tr = document.createElement("tr");
-        tr.className = "hover:bg-slate-50 transition-colors border-b border-slate-200";
-        tr.innerHTML = `
-            <td class="py-3 px-3 font-semibold font-outfit text-slate-900">${item.metric}</td>
-            <td class="py-3 px-3 text-rose-700 font-bold font-mono">${item.baseline}</td>
-            <td class="py-3 px-3 text-emerald-700 font-bold font-mono">${item.agentic}</td>
-            <td class="py-3 px-3 text-indigo-800 font-mono text-[9.5px]">${item.formula}</td>
-            <td class="py-3 px-3 text-cyan-700 font-bold text-right font-mono">${item.gain}</td>
-        `;
-        tbody.appendChild(tr);
-    });
+        somQuantitativeMetrics.forEach(item => {
+            const tr = document.createElement("tr");
+            tr.className = "hover:bg-slate-50 transition-colors border-b border-slate-200";
+            tr.innerHTML = `
+                <td class="py-3 px-3 font-semibold font-outfit text-slate-900">${item.metric}</td>
+                <td class="py-3 px-3 text-rose-700 font-bold font-mono">${item.baseline}</td>
+                <td class="py-3 px-3 text-emerald-700 font-bold font-mono">${item.agentic}</td>
+                <td class="py-3 px-3 text-indigo-800 font-mono text-[9.5px]">${item.formula}</td>
+                <td class="py-3 px-3 text-cyan-700 font-bold text-right font-mono">${item.gain}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    } catch (e) {
+        console.error("Error rendering matrix table:", e);
+    }
 }
 
 function initBarChart() {
-    const ctx = document.getElementById("barChart").getContext("2d");
-    barChartInstance = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ['Wait Time (min)', 'Queue (req)', 'STP (%)', 'DPMO (/1k)', 'MTTR (min)', 'Waste (%)'],
-            datasets: [
-                { label: 'Baseline (Page 1)', data: [852, 18, 34.5, 18.4, 85.0, 31.2], backgroundColor: 'rgba(244, 63, 94, 0.75)', borderColor: '#f43f5e', borderWidth: 1 },
-                { label: 'Agentic EaaS (Page 2)', data: [48.5, 2, 78.2, 2.1, 14.5, 8.4], backgroundColor: 'rgba(16, 185, 129, 0.75)', borderColor: '#10b981', borderWidth: 1 }
-            ]
-        },
-        options: { responsive: true, maintainAspectRatio: false }
-    });
+    if (typeof Chart === 'undefined') return;
+    const canvas = document.getElementById("barChart");
+    if (!canvas) return;
+
+    try {
+        const ctx = canvas.getContext("2d");
+        if (barChartInstance) barChartInstance.destroy();
+
+        barChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Wait Time (min)', 'Queue (req)', 'STP (%)', 'DPMO (/1k)', 'MTTR (min)', 'Waste (%)'],
+                datasets: [
+                    { label: 'Baseline (Page 1)', data: [852, 18, 34.5, 18.4, 85.0, 31.2], backgroundColor: 'rgba(244, 63, 94, 0.75)', borderColor: '#f43f5e', borderWidth: 1 },
+                    { label: 'Agentic EaaS (Page 2)', data: [48.5, 2, 78.2, 2.1, 14.5, 8.4], backgroundColor: 'rgba(16, 185, 129, 0.75)', borderColor: '#10b981', borderWidth: 1 }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { labels: { font: { family: 'Outfit', size: 10 } } }
+                }
+            }
+        });
+    } catch (e) {
+        console.error("Error initializing bar chart:", e);
+    }
 }
 
 function updateBarChart() {
     if (!barChartInstance) return;
-    barChartInstance.update();
+    try {
+        barChartInstance.update();
+    } catch (e) {
+        console.error("Error updating bar chart:", e);
+    }
 }
 
 function initRadarChart() {
-    const ctx = document.getElementById("radarChart").getContext("2d");
-    radarChartInstance = new Chart(ctx, {
-        type: 'radar',
-        data: {
-            labels: ['Wait Time', 'Queue', 'DEA (θ)', 'STP %', 'DPMO', 'MTTR', 'SERVQUAL', 'Yield'],
-            datasets: [
-                { label: 'Baseline (Page 1)', data: [25, 20, 62, 34.5, 36, 25, 35, 30], borderColor: '#f43f5e', backgroundColor: 'rgba(244, 63, 94, 0.12)' },
-                { label: 'Agentic EaaS (Page 2)', data: [88, 90, 89, 78.2, 88, 85, 82, 84], borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.12)' }
-            ]
-        },
-        options: { responsive: true, maintainAspectRatio: false }
-    });
+    if (typeof Chart === 'undefined') return;
+    const canvas = document.getElementById("radarChart");
+    if (!canvas) return;
+
+    try {
+        const ctx = canvas.getContext("2d");
+        if (radarChartInstance) radarChartInstance.destroy();
+
+        radarChartInstance = new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: ['Wait Time', 'Queue', 'DEA (θ)', 'STP %', 'DPMO', 'MTTR', 'SERVQUAL', 'Yield'],
+                datasets: [
+                    { label: 'Baseline (Page 1)', data: [25, 20, 62, 34.5, 36, 25, 35, 30], borderColor: '#f43f5e', backgroundColor: 'rgba(244, 63, 94, 0.12)' },
+                    { label: 'Agentic EaaS (Page 2)', data: [88, 90, 89, 78.2, 88, 85, 82, 84], borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.12)' }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { labels: { font: { family: 'Outfit', size: 10 } } }
+                }
+            }
+        });
+    } catch (e) {
+        console.error("Error initializing radar chart:", e);
+    }
 }
