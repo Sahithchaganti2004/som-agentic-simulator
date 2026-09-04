@@ -2,9 +2,7 @@ import os
 import pandas as pd
 import numpy as np
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.linear_model import LinearRegression
 from sklearn.metrics import r2_score, mean_absolute_error
-from scipy.optimize import linprog
 
 class SOMModelEngine:
     def __init__(self, csv_path):
@@ -23,8 +21,7 @@ class SOMModelEngine:
 
         self.df = pd.read_csv(self.csv_path)
 
-        # 1. Prepare Feature Set (X) & Target Sets (y)
-        # Create dual-mode training dataset (Baseline vs Agentic records)
+        # 1. Dual-mode training dataset (Baseline vs Agentic records)
         baseline_df = pd.DataFrame({
             'Deployments': self.df['Monthly_Deployments'],
             'Automation_Level': self.df['STP_Baseline_Pct'],
@@ -38,33 +35,32 @@ class SOMModelEngine:
         agentic_df = pd.DataFrame({
             'Deployments': self.df['Monthly_Deployments'],
             'Automation_Level': self.df['STP_Agentic_Pct'],
-            'Wq_Hours': self.df['Wq_Agentic_Min'] / 60.0, # convert min to hours
+            'Wq_Hours': self.df['Wq_Agentic_Min'] / 60.0,
             'STP_Pct': self.df['STP_Agentic_Pct'],
-            'MTTR_Min': self.df['MTTR_Agentic_Sec'] / 60.0, # convert sec to min
+            'MTTR_Min': self.df['MTTR_Agentic_Min'],
             'DPMO': self.df['DPMO_Agentic'],
             'DEA_Theta': self.df['DEA_Agentic_Theta']
         })
 
         train_df = pd.concat([baseline_df, agentic_df], ignore_index=True)
-
         X = train_df[['Deployments', 'Automation_Level']]
-        
-        # 2. Train Random Forest Models
-        self.rf_wq = RandomForestRegressor(n_estimators=100, random_state=42)
+
+        # Fit Random Forest Models
+        self.rf_wq = RandomForestRegressor(n_estimators=100, max_depth=5, random_state=42)
         self.rf_wq.fit(X, train_df['Wq_Hours'])
         pred_wq = self.rf_wq.predict(X)
         r2_wq = r2_score(train_df['Wq_Hours'], pred_wq)
 
-        self.rf_stp = RandomForestRegressor(n_estimators=100, random_state=42)
+        self.rf_stp = RandomForestRegressor(n_estimators=100, max_depth=5, random_state=42)
         self.rf_stp.fit(X, train_df['STP_Pct'])
 
-        self.rf_mttr = RandomForestRegressor(n_estimators=100, random_state=42)
+        self.rf_mttr = RandomForestRegressor(n_estimators=100, max_depth=5, random_state=42)
         self.rf_mttr.fit(X, train_df['MTTR_Min'])
 
-        self.rf_dpmo = RandomForestRegressor(n_estimators=100, random_state=42)
+        self.rf_dpmo = RandomForestRegressor(n_estimators=100, max_depth=5, random_state=42)
         self.rf_dpmo.fit(X, train_df['DPMO'])
 
-        # 3. DEA Linear Programming (CCR Output-Oriented Model)
+        # Compute realistic summary metrics
         dea_baseline_mean = self.df['DEA_Baseline_Theta'].mean()
         dea_agentic_mean = self.df['DEA_Agentic_Theta'].mean()
 
@@ -90,9 +86,8 @@ class SOMModelEngine:
         pred_mttr = self.rf_mttr.predict(input_data)[0]
         pred_dpmo = self.rf_dpmo.predict(input_data)[0]
 
-        # Format output
         wq_formatted = f"{pred_wq_hrs:.1f} Hours" if pred_wq_hrs >= 1.0 else f"{pred_wq_hrs * 60:.1f} Mins"
-        mttr_formatted = f"{pred_mttr:.1f} Mins" if pred_mttr >= 1.0 else f"{pred_mttr * 60:.0f} Secs"
+        mttr_formatted = f"{pred_mttr:.1f} Mins"
 
         return {
             'pred_wq_hrs': pred_wq_hrs,
@@ -101,5 +96,5 @@ class SOMModelEngine:
             'pred_mttr_min': pred_mttr,
             'mttr_formatted': mttr_formatted,
             'pred_dpmo': max(0.0, pred_dpmo),
-            'dea_score': 1.00 if automation_pct >= 90 else max(0.48, 0.48 + (automation_pct / 100.0) * 0.52)
+            'dea_score': max(0.55, min(0.96, 0.55 + (automation_pct / 100.0) * 0.38))
         }

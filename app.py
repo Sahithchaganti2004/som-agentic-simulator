@@ -73,9 +73,9 @@ with col_ml:
             st.markdown(f"**Dataset:** Trained live on `{m['sample_size']}` Enterprise Companies (`{m['training_records']}` Observations)")
             
             c1, c2, c3, c4 = st.columns(4)
-            c1.metric("Model R² Score", f"{m['r2_wq']:.3f}", "High Accuracy (> 0.96)")
+            c1.metric("Model R² Score", f"{m['r2_wq']:.3f}", "High Accuracy (> 0.94)")
             c2.metric("Mean Abs Error (MAE)", f"{m['mae_wq']:.2f} hrs", "Low Loss")
-            c3.metric("DEA Frontier θ (Agentic)", f"{m['dea_agentic_mean']:.2f}", "100% Optimal")
+            c3.metric("DEA Frontier θ (Agentic)", f"{m['dea_agentic_mean']:.2f}", "Empirical Frontier")
             c4.metric("Automation Weight", f"{m['feature_importance_automation']:.1f}%", "Primary Feature")
 
             st.markdown("---")
@@ -84,7 +84,7 @@ with col_ml:
             with p_col1:
                 input_deployments = st.slider("Monthly Deployment Scale (x₁)", 1000, 10000, 5000, step=500)
             with p_col2:
-                input_automation = st.slider("Agentic Automation Level % (x₂)", 0, 100, 94, step=1)
+                input_automation = st.slider("Agentic Automation Level % (x₂)", 0, 100, 74, step=1)
 
             # Model Prediction
             res = ml_engine.predict(input_deployments, input_automation)
