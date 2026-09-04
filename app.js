@@ -55,12 +55,49 @@ const somQuantitativeMetrics = [
     { domain: "Measuring Service Productivity", module: "Capacity & Yield Management", metric: "Zombie Cloud Resource Waste", baseline: "31.2% Monthly Spend", baselineRaw: 31.2, agentic: "8.4% Monthly Spend", agenticRaw: 8.4, formula: "Waste % = (Idle Cost / Total Spend) * 100", gain: "-73.1% Cost Savings", pctGain: 73.1 }
 ];
 
+// ==========================================
+// 2. COMPLETE 8-MODULE SOM DATABASE (24 ASPECTS)
+// ==========================================
 const somDatabase = [
-    { module: "Service Process & System Design", aspect: "Blueprint Adaptability", traditional: "Rigid static paper designs requiring manual revision.", orchestrated: "Dynamic self-generating digital blueprints.", advantage: "Accelerates configuration updates." },
-    { module: "Service Encounter", aspect: "Interaction Interface", traditional: "Form-based ticketing tools with manual configuration inputs.", orchestrated: "Conversational prompt interfaces translating intent automatically.", advantage: "Simplifies requirements gathering." },
-    { module: "Service Layouts & Process Analysis", aspect: "Layout Transparency", traditional: "Opaque email inboxes hiding queue bottlenecks.", orchestrated: "Interactive dashboards visualizing active workloads.", advantage: "Exposes operational bottlenecks instantly." },
-    { module: "Service Quality & Process Control", aspect: "Compliance Auditing", traditional: "Periodic manual checkbox audits.", orchestrated: "Pre-deployment automated policy guardrail scans.", advantage: "Prevents security policy violations." },
-    { module: "Measuring Service Productivity", aspect: "Labor Productivity", traditional: "Output bound to manual engineering hours.", orchestrated: "High output enabled by parallel AI agent orchestration.", advantage: "Decouples throughput from staff size." }
+    // Module 1: Service Process & System Design
+    { module: "Service Process & System Design", aspect: "Blueprint Adaptability", traditional: "Rigid, static paper designs that require manual revision and administrative review for every infrastructure update.", orchestrated: "Dynamic, self-generating digital blueprints matching live workspace states automatically.", advantage: "Accelerates configuration updates and eliminates documentation lag." },
+    { module: "Service Process & System Design", aspect: "Service Customization", traditional: "Hand-crafted configurations custom-made by engineers for every separate developer request, leading to script drift.", orchestrated: "Modular configuration generation based on user intent and standardized template parameters.", advantage: "Standardizes deployment components while retaining developer flexibility." },
+    { module: "Service Process & System Design", aspect: "Handoff Boundaries", traditional: "Serial handoffs across isolation boundaries between security, network, and operations teams.", orchestrated: "Unified agentic orchestration crossing boundaries instantly through programmatic API calls.", advantage: "Prevents process delays and eliminates queue backlogs between departments." },
+
+    // Module 2: Service Encounter
+    { module: "Service Encounter", aspect: "Interaction Interface", traditional: "Complex form-based ticketing tools that require users to input technical configuration parameters manually.", orchestrated: "Conversational, natural language prompt interfaces that translate intent into deployment tasks.", advantage: "Simplifies requirements gathering and removes user barrier-to-entry." },
+    { module: "Service Encounter", aspect: "Friction Level", traditional: "High contact intensity requiring active negotiation, back-and-forth emails, and manual follow-ups.", orchestrated: "Zero-friction self-service execution with instant automated setup confirmations.", advantage: "Eliminates human coordination overhead and developer frustration." },
+    { module: "Service Encounter", aspect: "Support Escalation", traditional: "Multi-tier escalation chains with engineers manually reading verbose system logs.", orchestrated: "Automated log parsing with packaged diagnostics ready for human-in-the-loop validation.", advantage: "Speeds up troubleshooting and resolution for complex technical faults." },
+
+    // Module 3: Service Layouts & Process Analysis
+    { module: "Service Layouts & Process Analysis", aspect: "Layout Transparency", traditional: "Opaque email inboxes and spreadsheets hiding queue bottleneck build-ups.", orchestrated: "Interactive, central dashboards visualizing resource loads and active container workspaces.", advantage: "Exposes operational bottlenecks instantly to team managers." },
+    { module: "Service Layouts & Process Analysis", aspect: "Handoff Latency", traditional: "Idle times while tickets wait in queue folders between team handovers.", orchestrated: "Instant REST API triggers transferring metadata payloads between microservices.", advantage: "Minimizes total non-value-adding waiting times." },
+    { module: "Service Layouts & Process Analysis", aspect: "Path Optimization", traditional: "Rework loops due to incorrect manual configuration scripts.", orchestrated: "Immutable template structures minimizing task execution steps.", advantage: "Standardizes critical path execution times." },
+
+    // Module 4: Service Quality & Process Control
+    { module: "Service Quality & Process Control", aspect: "Compliance Auditing", traditional: "Periodic, manual checkbox audits after environments are deployed.", orchestrated: "Pre-deployment automated policy guardrail scans.", advantage: "Prevents budget and security policy violations before resource creation." },
+    { module: "Service Quality & Process Control", aspect: "Quality Inspection", traditional: "Manual validation checks performed by QA engineers (highly error-prone).", orchestrated: "Systematic check routines verifying container connectivity and state configurations.", advantage: "Eliminates human oversight defects and syntax errors." },
+    { module: "Service Quality & Process Control", aspect: "Service Recovery", traditional: "Reactive troubleshooting and ticket re-submission after environments crash.", orchestrated: "Autonomic self-healing engines rebuilding corrupted nodes instantly.", advantage: "Maintains maximum uptime without developer intervention." },
+
+    // Module 5: Measuring Service Productivity
+    { module: "Measuring Service Productivity", aspect: "Labor Productivity", traditional: "Output bound to manual engineer hours, resulting in low setups per headcount.", orchestrated: "High output enabled by parallel AI agent orchestration.", advantage: "Decouples service throughput from operational staff sizes." },
+    { module: "Measuring Service Productivity", aspect: "Resource Utilization", traditional: "Static provisioning leads to idle servers running continuously to avoid startup delays.", orchestrated: "Elastic containers running only during active workspace sessions.", advantage: "Drastically reduces cloud compute waste and operational cost." },
+    { module: "Measuring Service Productivity", aspect: "Process Efficiency", traditional: "High ratio of waiting times to active processing times.", orchestrated: "Streamlined execution where processing time equals total cycle time.", advantage: "Maximizes value-adding activity ratios." },
+
+    // Module 6: Managing Waiting Lines & Queuing Theory
+    { module: "Managing Waiting Lines & Queuing Theory", aspect: "Queuing Architecture", traditional: "Serialized M/M/c queues processed by limited human engineering teams.", orchestrated: "Parallel on-demand containers (M/M/c API model).", advantage: "Eliminates request queues even during high demand peaks." },
+    { module: "Managing Waiting Lines & Queuing Theory", aspect: "Customer Balking / Reneging", traditional: "Developers abandon request tickets due to excessive wait times.", orchestrated: "Instant confirmation and near-zero waiting loops.", advantage: "Prevents project delays and team frustration." },
+    { module: "Managing Waiting Lines & Queuing Theory", aspect: "Demand Fluctuations", traditional: "Fixed engineer capacity causes severe queue build-ups during business hours.", orchestrated: "Dynamic auto-scaling provisions nodes matching real-time request counts.", advantage: "Absorbs sudden request spikes without performance degradation." },
+
+    // Module 7: Service Strategy & SLA Management
+    { module: "Service Strategy & SLA Management", aspect: "Competitive Dimension", traditional: "Operations compete purely on cost, compromising on service speed.", orchestrated: "Operations win on speed and responsiveness as differentiators.", advantage: "Empowers product teams to ship updates to market much faster." },
+    { module: "Service Strategy & SLA Management", aspect: "SLA Adherence", traditional: "Frequent breaches due to backlog queues and validation back-and-forth.", orchestrated: "Standard SLA fulfillment via automated provisioning runs.", advantage: "Ensures service reliability guarantees are met consistently." },
+    { module: "Service Strategy & SLA Management", aspect: "Value Proposition", traditional: "IT seen as a cost center managing routine maintenance.", orchestrated: "IT acts as an innovation partner accelerating development.", advantage: "Shifts business perspective of infrastructure operations." },
+
+    // Module 8: Technology-Driven Service Operations
+    { module: "Technology-Driven Service Operations", aspect: "System Integration", traditional: "Disjointed tooling requiring manual copy-pasting of scripts and settings.", orchestrated: "API-driven loops linking intent parsers directly to Terraform/Cloudify.", advantage: "Eliminates human error during configuration transfers." },
+    { module: "Technology-Driven Service Operations", aspect: "Infrastructure State", traditional: "Mutable environments with script drift and custom manual changes.", orchestrated: "Immutable configuration declarations managed by state files.", advantage: "Guarantees environment consistency across multiple deployments." },
+    { module: "Technology-Driven Service Operations", aspect: "Telemetry & Monitoring", traditional: "Reactive log checks conducted only when a user files a support ticket.", orchestrated: "Real-time metric streaming and automated anomaly detection.", advantage: "Detects potential configuration failures before developers notice." }
 ];
 
 // State Engine & Variables
@@ -71,17 +108,13 @@ let datasetSectorFilter = "all";
 let radarChartInstance = null;
 let barChartInstance = null;
 
-// Pipeline Simulation States
 let baselineSimActive = false;
 let agenticSimActive = false;
 
-// Overlay Modal State
 let overlayVisType = 'blueprint';
 let overlayVisAgentic = false;
 let overlayOpen = false;
-let overlayAnimId = null;
 
-// 60FPS HTML5 PARTICLE QUEUING ENGINE VARIABLES
 let desParticlesB = [];
 let desParticlesA = [];
 let desFrameCount = 0;
@@ -189,7 +222,119 @@ function switchMetricMode(mode) {
 }
 
 // ==========================================
-// 3. OVERLAY MODAL RENDERERS (BLUEPRINT, QFD, DEA, QUEUE)
+// 3. SOM MODULE EXPLORER SIDEBAR & SLIDING DRAWER
+// ==========================================
+function renderExplorerList() {
+    try {
+        const listContainer = document.getElementById("som-explorer-list");
+        if (!listContainer) return;
+        listContainer.innerHTML = "";
+
+        const uniqueModules = [...new Set(somDatabase.map(item => item.module))];
+
+        uniqueModules.forEach(modName => {
+            const itemEl = document.createElement("div");
+            itemEl.className = "som-explorer-card p-3 rounded-2xl text-xs font-semibold text-slate-700 hover:text-slate-900 flex items-center justify-between cursor-pointer transition-all border border-slate-200 hover:border-indigo-400 bg-white shadow-sm";
+            
+            let iconHtml = "<i class='fa-solid fa-bezier-curve text-indigo-600'></i>";
+            if (modName.includes("Encounter")) iconHtml = "<i class='fa-solid fa-people-arrows text-cyan-600'></i>";
+            if (modName.includes("Quality")) iconHtml = "<i class='fa-solid fa-circle-check text-emerald-600'></i>";
+            if (modName.includes("Productivity")) iconHtml = "<i class='fa-solid fa-chart-line text-indigo-600'></i>";
+            if (modName.includes("Lines")) iconHtml = "<i class='fa-solid fa-users text-rose-600'></i>";
+            if (modName.includes("Strategy")) iconHtml = "<i class='fa-solid fa-crosshairs text-indigo-600'></i>";
+            if (modName.includes("Technology")) iconHtml = "<i class='fa-solid fa-microchip text-cyan-600'></i>";
+
+            itemEl.innerHTML = `
+                <div class="flex items-center gap-2 pointer-events-none">
+                    ${iconHtml}
+                    <span>${modName}</span>
+                </div>
+                <i class="fa-solid fa-chevron-right text-[10px] text-slate-400 pointer-events-none"></i>
+            `;
+            
+            itemEl.addEventListener("click", () => openSOMDrawer(modName));
+            listContainer.appendChild(itemEl);
+        });
+    } catch (e) {
+        console.error("Error rendering explorer list:", e);
+    }
+}
+
+function openSOMDrawer(modName) {
+    try {
+        const drawer = document.getElementById("som-drawer");
+        const title = document.getElementById("drawer-title");
+        const category = document.getElementById("drawer-category");
+
+        if (title) title.textContent = modName;
+        if (category) category.textContent = "SOM Evaluation Context";
+
+        const items = somDatabase.filter(d => d.module === modName);
+
+        renderDrawerMicroVisual(modName);
+
+        if (items[0]) {
+            document.getElementById("drawer-aspect-1-title").textContent = items[0].aspect;
+            document.getElementById("drawer-aspect-1-trad").textContent = items[0].traditional;
+            document.getElementById("drawer-aspect-1-orchestrated").textContent = items[0].orchestrated;
+            document.getElementById("drawer-aspect-1-adv").textContent = items[0].advantage;
+        }
+
+        if (items[1]) {
+            document.getElementById("drawer-aspect-2-title").textContent = items[1].aspect;
+            document.getElementById("drawer-aspect-2-trad").textContent = items[1].traditional;
+            document.getElementById("drawer-aspect-2-orchestrated").textContent = items[1].orchestrated;
+            document.getElementById("drawer-aspect-2-adv").textContent = items[1].advantage;
+        }
+
+        if (items[2]) {
+            document.getElementById("drawer-aspect-3-title").textContent = items[2].aspect;
+            document.getElementById("drawer-aspect-3-trad").textContent = items[2].traditional;
+            document.getElementById("drawer-aspect-3-orchestrated").textContent = items[2].orchestrated;
+            document.getElementById("drawer-aspect-3-adv").textContent = items[2].advantage;
+        }
+
+        if (drawer) drawer.classList.add("open-drawer");
+    } catch (e) {
+        console.error("Error opening SOM drawer:", e);
+    }
+}
+
+function closeSOMDrawer() {
+    try {
+        const drawer = document.getElementById("som-drawer");
+        if (drawer) drawer.classList.remove("open-drawer");
+    } catch (e) {
+        console.error("Error closing SOM drawer:", e);
+    }
+}
+
+function renderDrawerMicroVisual(modName) {
+    try {
+        const container = document.getElementById("drawer-micro-visual");
+        if (!container) return;
+
+        container.innerHTML = `
+            <svg width="340" height="60" viewBox="0 0 340 60" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto">
+                <rect x="10" y="10" width="130" height="40" rx="8" fill="#ffffff" stroke="#f43f5e" stroke-width="1.5" stroke-dasharray="3 3"/>
+                <text x="75" y="27" fill="#e11d48" font-size="9" font-family="Outfit" font-weight="bold" text-anchor="middle">BASELINE STATE</text>
+                <text x="75" y="40" fill="#64748b" font-size="8" font-family="Outfit" text-anchor="middle">Manual Lags & Congestion</text>
+                
+                <path d="M150 30H185" stroke="#4338ca" stroke-width="2" stroke-dasharray="2 2"/>
+                <polygon points="187,30 180,26 180,34" fill="#4338ca"/>
+                
+                <rect x="195" y="10" width="135" height="40" rx="8" fill="#ffffff" stroke="#10b981" stroke-width="1.5"/>
+                <text x="262" y="27" fill="#047857" font-size="9" font-family="Outfit" font-weight="bold" text-anchor="middle">AGENTIC EAAS</text>
+                <text x="262" y="40" fill="#64748b" font-size="8" font-family="Outfit" text-anchor="middle">78% Auto & θ = 0.89</text>
+            </svg>
+        `;
+    } catch (e) {
+        console.error("Error rendering drawer micro-visual:", e);
+    }
+}
+
+// ==========================================
+// 4. OVERLAY MODAL RENDERERS (BLUEPRINT, QFD, DEA, QUEUE)
 // ==========================================
 function openVisOverlay(type, isAgentic) {
     try {
@@ -278,27 +423,11 @@ function renderOverlayFrame() {
     }
 }
 
-// ------------------------------------------
-// 1. DRAW FIGURE 5.6 SERVICE BLUEPRINT
-// ------------------------------------------
 function drawBlueprintVisual(ctx, w, h) {
     const laneHeight = h / 5;
-    const lanes = [
-        "1. Physical Evidence / Influence",
-        "2. Customer Actions",
-        "3. Onstage / Front Office",
-        "4. Backstage / Back Office",
-        "5. Support Processes"
-    ];
+    const lanes = ["1. Physical Evidence", "2. Customer Actions", "3. Onstage Actions", "4. Backstage Actions", "5. Support Processes"];
+    const boundaryLines = ["LINE OF INFLUENCE", "LINE OF INTERACTION", "LINE OF VISIBILITY", "LINE OF SUPPORT"];
 
-    const boundaryLines = [
-        "LINE OF INFLUENCE",
-        "LINE OF INTERACTION",
-        "LINE OF VISIBILITY",
-        "LINE OF SUPPORT"
-    ];
-
-    // Swimlane Grid
     ctx.strokeStyle = "rgba(51, 65, 85, 0.4)";
     ctx.lineWidth = 1;
     ctx.font = "bold 8px Outfit";
@@ -335,7 +464,6 @@ function drawBlueprintVisual(ctx, w, h) {
         { x: 650, y: laneHeight * 4.5, txt: "ITSM DB & Spreadsheets" }
     ];
 
-    // Draw Connecting Line
     ctx.strokeStyle = overlayVisAgentic ? "rgba(16, 185, 129, 0.5)" : "rgba(244, 63, 94, 0.5)";
     ctx.lineWidth = 2;
     ctx.beginPath();
@@ -343,7 +471,6 @@ function drawBlueprintVisual(ctx, w, h) {
     for (let i = 1; i < boxes.length; i++) ctx.lineTo(boxes[i].x, boxes[i].y);
     ctx.stroke();
 
-    // Draw Nodes
     boxes.forEach(box => {
         ctx.fillStyle = "rgba(15, 23, 42, 0.95)";
         ctx.strokeStyle = overlayVisAgentic ? "rgba(16, 185, 129, 0.8)" : "rgba(244, 63, 94, 0.8)";
@@ -360,7 +487,6 @@ function drawBlueprintVisual(ctx, w, h) {
         ctx.textAlign = "left";
     });
 
-    // Animated Packet
     blueprintAnimT += 0.008;
     if (blueprintAnimT > 1) blueprintAnimT = 0;
     let pidx = Math.floor(blueprintAnimT * 4);
@@ -380,9 +506,6 @@ function drawBlueprintVisual(ctx, w, h) {
     }
 }
 
-// ------------------------------------------
-// 2. DRAW QFD HOUSE OF QUALITY MATRIX
-// ------------------------------------------
 function drawQFDVisual(ctx, w, h) {
     let startX = 220;
     let startY = 110;
@@ -392,7 +515,6 @@ function drawQFDVisual(ctx, w, h) {
     const whats = ["Fast Provisioning", "Error-Free Scripting", "Budget Compliance", "Role-Based Safety"];
     const hows = overlayVisAgentic ? ["AI Intent Parsing", "Auto Policy Check", "Cloudify Blueprints", "Terraform State Sync"] : ["Manual HCL Editing", "Engineer Experience", "Manual SLA Checks", "Spreadsheet Auditing"];
 
-    // Correlation Roof Triangle
     let roofTopX = startX + (cellW * 2);
     let roofTopY = 25;
     ctx.fillStyle = "rgba(15, 23, 42, 0.6)";
@@ -411,7 +533,6 @@ function drawQFDVisual(ctx, w, h) {
     ctx.textAlign = "center";
     ctx.fillText(overlayVisAgentic ? "CORRELATION ROOF: POSITIVE SYNERGY (+)" : "CORRELATION ROOF: HIGH TRADE-OFF FRICTION (❌)", roofTopX, roofTopY + 40);
 
-    // Columns (HOWs)
     hows.forEach((how, j) => {
         let x = startX + (j * cellW);
         let y = startY;
@@ -429,7 +550,6 @@ function drawQFDVisual(ctx, w, h) {
         ctx.fillText(how, x + cellW / 2, y + cellH / 2 + 3);
     });
 
-    // Rows (WHATs)
     whats.forEach((what, i) => {
         let y = startY + cellH + (i * cellH);
 
@@ -467,16 +587,12 @@ function drawQFDVisual(ctx, w, h) {
     ctx.textAlign = "left";
 }
 
-// ------------------------------------------
-// 3. DRAW DEA SCATTER & CONVEX FRONTIER
-// ------------------------------------------
 function drawDEAVisual(ctx, w, h) {
     let originX = 65;
     let originY = h - 50;
     let chartW = w - 100;
     let chartH = h - 90;
 
-    // Axes
     ctx.strokeStyle = "rgba(148, 163, 184, 0.4)";
     ctx.lineWidth = 1.5;
     ctx.beginPath();
@@ -490,7 +606,6 @@ function drawDEAVisual(ctx, w, h) {
     ctx.fillText("OUTPUT: Service Throughput (Deployments / Hour)", originX + 10, 25);
     ctx.fillText("INPUT: Operational Labor Cost & Cycle Time (x_i)", originX + chartW - 190, originY + 25);
 
-    // Convex Frontier Curve
     ctx.strokeStyle = "#10b981";
     ctx.lineWidth = 2.5;
     ctx.beginPath();
@@ -534,9 +649,6 @@ function drawDEAVisual(ctx, w, h) {
     ctx.fillText(overlayVisAgentic ? "AGENTIC EAAS FRONTIER SCORE: θ = 0.89 (High Efficiency Boundary)" : "BASELINE FRONTIER SCORE: θ = 0.62 (Sub-Optimal Inefficiency)", originX + 20, originY - 10);
 }
 
-// ------------------------------------------
-// 4. DRAW OVERLAY QUEUE DYNAMICS
-// ------------------------------------------
 function drawQueueVisual(ctx, w, h) {
     ctx.fillStyle = "#94a3b8";
     ctx.font = "bold 10px Outfit";
@@ -552,7 +664,7 @@ function drawQueueVisual(ctx, w, h) {
 }
 
 // ==========================================
-// 4. STRESS-TEST SCENARIO PRESETS & DES HANDLERS
+// 5. STRESS-TEST SCENARIO PRESETS & DES HANDLERS
 // ==========================================
 function applyScenarioPreset(presetType, mode) {
     try {
@@ -637,7 +749,14 @@ function runDES(mode) {
             document.getElementById("metric-b-wq").textContent = `${simulatedWq.toFixed(1)} Hours`;
             document.getElementById("metric-b-lq").textContent = `${simulatedBacklog} Requests`;
 
-            alert(`Discrete-Event Simulation Completed (${steps} steps)! Simulated Mean Wq: ${simulatedWq.toFixed(1)} Hours.`);
+            // Step through baseline pipeline nodes b1..b5
+            ["b1", "b2", "b3", "b4", "b5"].forEach((nid, index) => {
+                setTimeout(() => {
+                    document.querySelectorAll("[data-node]").forEach(el => el.classList.remove("border-rose-400", "border-emerald-400", "shadow-lg"));
+                    const target = document.querySelector(`[data-node="${nid}"]`);
+                    if (target) target.classList.add("border-rose-400", "shadow-lg");
+                }, index * 400);
+            });
         } else {
             let lambda = parseFloat(document.getElementById("sim-a-lambda").value);
             let nodes = parseFloat(document.getElementById("sim-a-nodes").value);
@@ -653,7 +772,14 @@ function runDES(mode) {
             document.getElementById("metric-a-wq").textContent = `${simulatedWqMin.toFixed(1)} Mins`;
             document.getElementById("metric-a-stp").textContent = `${simulatedSTP.toFixed(1)}%`;
 
-            alert(`Discrete-Event Simulation Completed (${steps} steps)! Simulated Mean Wq: ${simulatedWqMin.toFixed(1)} Mins.`);
+            // Step through agentic pipeline nodes a1..a5
+            ["a1", "a2", "a3", "a4", "a5"].forEach((nid, index) => {
+                setTimeout(() => {
+                    document.querySelectorAll("[data-node]").forEach(el => el.classList.remove("border-rose-400", "border-emerald-400", "shadow-lg"));
+                    const target = document.querySelector(`[data-node="${nid}"]`);
+                    if (target) target.classList.add("border-emerald-400", "shadow-lg");
+                }, index * 300);
+            });
         }
     } catch (e) {
         console.error("Error running DES simulation:", e);
@@ -661,7 +787,7 @@ function runDES(mode) {
 }
 
 // ==========================================
-// 5. INTERACTIVE FINANCIAL ROI CALCULATOR
+// 6. INTERACTIVE FINANCIAL ROI CALCULATOR
 // ==========================================
 function updateROICalculator() {
     try {
@@ -688,7 +814,7 @@ function updateROICalculator() {
 }
 
 // ==========================================
-// 6. 60FPS HTML5 CANVAS PARTICLE ANIMATION LOOP
+// 7. 60FPS HTML5 CANVAS PARTICLE ANIMATION LOOP
 // ==========================================
 function animationLoop() {
     desFrameCount++;
@@ -707,7 +833,6 @@ function animationLoop() {
             if (ctx) {
                 ctx.clearRect(0, 0, canvasB.width, canvasB.height);
 
-                // Queue Lane Box
                 ctx.strokeStyle = "rgba(244, 63, 94, 0.35)";
                 ctx.lineWidth = 1.5;
                 ctx.setLineDash([4, 4]);
@@ -718,7 +843,6 @@ function animationLoop() {
                 ctx.font = "bold 9px Outfit";
                 ctx.fillText("INCOMING TICKET QUEUE (Lq Backlog)", 50, 30);
 
-                // Human Operator Server Node
                 let nodeX = canvasB.width - 80;
                 ctx.fillStyle = desFrameCount % 60 < 30 ? "rgba(244, 63, 94, 0.85)" : "rgba(245, 158, 11, 0.85)";
                 ctx.strokeStyle = "#f43f5e";
@@ -734,7 +858,6 @@ function animationLoop() {
                 ctx.fillText("OVERLOAD", nodeX, 83);
                 ctx.textAlign = "left";
 
-                // Spawn Request Particles
                 if (desFrameCount % 35 === 0 && desParticlesB.length < 18) {
                     desParticlesB.push({
                         x: 10,
@@ -796,7 +919,6 @@ function animationLoop() {
                     { x: step * 4, label: "🏗️ Terraform" }
                 ];
 
-                // Connect Line
                 ctx.strokeStyle = "rgba(16, 185, 129, 0.4)";
                 ctx.lineWidth = 2;
                 ctx.setLineDash([4, 4]);
@@ -822,7 +944,6 @@ function animationLoop() {
                     ctx.textAlign = "left";
                 });
 
-                // Spawn Prompt Particles
                 if (desFrameCount % 18 === 0 && desParticlesA.length < 14) {
                     desParticlesA.push({ x: 30, y: 75, speed: 5.0 });
                 }
@@ -858,7 +979,7 @@ function animationLoop() {
 }
 
 // ==========================================
-// 7. RENDERERS & DATA HANDLERS
+// 8. RENDERERS & DATA HANDLERS
 // ==========================================
 function renderDatasetTable() {
     try {
@@ -914,59 +1035,6 @@ function downloadCSVDataset() {
     }
 }
 
-function renderExplorerList() {
-    try {
-        const listContainer = document.getElementById("som-explorer-list");
-        if (!listContainer) return;
-        listContainer.innerHTML = "";
-
-        const uniqueModules = [...new Set(somDatabase.map(item => item.module))];
-
-        uniqueModules.forEach(modName => {
-            const itemEl = document.createElement("div");
-            itemEl.className = "som-explorer-card p-3 rounded-2xl text-xs font-semibold text-slate-700 hover:text-slate-900 flex items-center justify-between cursor-pointer transition-all";
-            
-            let iconHtml = "<i class='fa-solid fa-bezier-curve text-indigo-600'></i>";
-            if (modName.includes("Encounter")) iconHtml = "<i class='fa-solid fa-people-arrows text-cyan-600'></i>";
-            if (modName.includes("Quality")) iconHtml = "<i class='fa-solid fa-circle-check text-emerald-600'></i>";
-            if (modName.includes("Productivity")) iconHtml = "<i class='fa-solid fa-chart-line text-indigo-600'></i>";
-
-            itemEl.innerHTML = `
-                <div class="flex items-center gap-2 pointer-events-none">
-                    ${iconHtml}
-                    <span>${modName}</span>
-                </div>
-                <i class="fa-solid fa-chevron-right text-[10px] text-slate-400 pointer-events-none"></i>
-            `;
-            
-            itemEl.addEventListener("click", () => openSOMDrawer(modName));
-            listContainer.appendChild(itemEl);
-        });
-    } catch (e) {
-        console.error("Error rendering explorer list:", e);
-    }
-}
-
-function openSOMDrawer(modName) {
-    try {
-        const drawer = document.getElementById("som-drawer");
-        document.getElementById("drawer-title").textContent = modName;
-        document.getElementById("drawer-category").textContent = "SOM Evaluation Context";
-        if (drawer) drawer.classList.add("open-drawer");
-    } catch (e) {
-        console.error("Error opening SOM drawer:", e);
-    }
-}
-
-function closeSOMDrawer() {
-    try {
-        const drawer = document.getElementById("som-drawer");
-        if (drawer) drawer.classList.remove("open-drawer");
-    } catch (e) {
-        console.error("Error closing SOM drawer:", e);
-    }
-}
-
 function startBaselineSimulation() {
     if (baselineSimActive) return;
     baselineSimActive = true;
@@ -985,7 +1053,40 @@ function startAgenticSimulation() {
     if (!promptVal) promptVal = "Provision a downscaled staging VM for testing";
 
     agenticSimActive = true;
-    logMessage("INTENT PARSER", `Received prompt: "${promptVal}"`);
+    logMessage("INTENT PARSER", `Received natural language prompt: "${promptVal}"`);
+    
+    highlightPipelineNode("a1");
+    
+    setTimeout(() => {
+        highlightPipelineNode("a2");
+        logMessage("LLM AGENT", "Parsing TOSCA DSL intent & mapping parameters to Terraform HCL template...");
+    }, 600);
+
+    setTimeout(() => {
+        highlightPipelineNode("a3");
+        logMessage("POLICY GUARD", "Scanning OPA security policies: RBAC check OK, Cloud budget check OK.");
+    }, 1200);
+
+    setTimeout(() => {
+        highlightPipelineNode("a4");
+        logMessage("CLOUDIFY ENGINE", "Triggering REST API orchestrator & applying Terraform state synchronization...");
+    }, 1800);
+
+    setTimeout(() => {
+        highlightPipelineNode("a5");
+        logMessage("AUTONOMIC SELF-HEAL", "Resource provisioned successfully in 48.5 seconds. Zero-touch STP complete.");
+        agenticSimActive = false;
+    }, 2400);
+}
+
+function highlightPipelineNode(nodeId) {
+    document.querySelectorAll("[data-node]").forEach(el => {
+        el.classList.remove("border-emerald-400", "border-rose-400", "shadow-lg");
+    });
+    const target = document.querySelector(`[data-node="${nodeId}"]`);
+    if (target) {
+        target.classList.add("border-emerald-400", "shadow-lg");
+    }
 }
 
 function logMessage(sub, msg) {
