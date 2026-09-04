@@ -1,7 +1,7 @@
 // Services Operations Management Simulator & Orchestration Engine
 
 // ==========================================
-// 0. CANVAS POLYFILLS & SAFENG HELPERS
+// 0. CANVAS POLYFILLS & SAFETY HELPERS
 // ==========================================
 if (typeof CanvasRenderingContext2D !== 'undefined' && !CanvasRenderingContext2D.prototype.roundRect) {
     CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, radii) {
@@ -85,10 +85,10 @@ let overlayAnimId = null;
 let desParticlesB = [];
 let desParticlesA = [];
 let desFrameCount = 0;
+let blueprintAnimT = 0;
+let deaAnimProgress = 0;
 
-// ==========================================
-// 2. INITIALIZATION & SAFEGUARD BINDINGS
-// ==========================================
+// Initialization
 document.addEventListener("DOMContentLoaded", () => {
     try { bindNavigation(); } catch (e) { console.error("Navigation error:", e); }
     try { renderExplorerList(); } catch (e) { console.error("Explorer list error:", e); }
@@ -96,7 +96,6 @@ document.addEventListener("DOMContentLoaded", () => {
     try { renderDatasetTable(); } catch (e) { console.error("Dataset table error:", e); }
     try { updateROICalculator(); } catch (e) { console.error("ROI calculator error:", e); }
 
-    // Safely wait for Chart.js CDN script to finish loading before initializing charts
     waitForChartJS();
 
     requestAnimationFrame(animationLoop);
@@ -190,7 +189,370 @@ function switchMetricMode(mode) {
 }
 
 // ==========================================
-// 3. STRESS-TEST PRESETS & DES HANDLERS
+// 3. OVERLAY MODAL RENDERERS (BLUEPRINT, QFD, DEA, QUEUE)
+// ==========================================
+function openVisOverlay(type, isAgentic) {
+    try {
+        overlayVisType = type;
+        overlayVisAgentic = isAgentic;
+        overlayOpen = true;
+
+        const modal = document.getElementById("vis-overlay-modal");
+        const badge = document.getElementById("vis-overlay-badge");
+        const title = document.getElementById("vis-overlay-title");
+        const desc = document.getElementById("vis-overlay-desc");
+
+        if (modal) modal.classList.remove("opacity-0", "pointer-events-none");
+
+        if (badge) {
+            badge.className = isAgentic ? 
+                "px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-300" : 
+                "px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-rose-100 text-rose-800 border border-rose-300";
+            badge.textContent = isAgentic ? "Agentic DevEaaS State (Page 2)" : "Traditional Baseline State (Page 1)";
+        }
+
+        if (type === 'blueprint') {
+            if (title) title.textContent = "Textbook Figure 5.6 Service Blueprint (5 Swimlanes)";
+            if (desc) desc.innerHTML = isAgentic ? 
+                "<strong>AI-Orchestrated Service Blueprint (Fig 5.6):</strong> Zero human handoff barriers. Prompts flow continuously from Chatbot Intent Parser to Policy Guardrails and Cloudify API triggers." : 
+                "<strong>Traditional Service Blueprint (Fig 5.6):</strong> Serial handoffs across manual isolation boundaries between security, operations, and budget teams.";
+        } else if (type === 'qfd') {
+            if (title) title.textContent = "Quality Function Deployment (QFD / House of Quality)";
+            if (desc) desc.innerHTML = isAgentic ? 
+                "<strong>AI-Optimized House of Quality:</strong> Strong positive synergy (+) between automated policy validation and deployment speed." : 
+                "<strong>Traditional House of Quality (Trade-off Friction):</strong> Severe negative trade-offs (❌) between manual script checking and speed requirements.";
+        } else if (type === 'dea') {
+            if (title) title.textContent = "Data Envelopment Analysis (DEA Efficiency Frontier)";
+            if (desc) desc.innerHTML = isAgentic ? 
+                "<strong>Data Envelopment Analysis (DEA):</strong> High efficiency score (<strong>θ = 0.89</strong>) operating near the Pareto-optimal frontier." : 
+                "<strong>Data Envelopment Analysis (DEA):</strong> Sub-optimal score (<strong>θ = 0.62</strong>) lying below the efficiency boundary line due to manual labor inputs.";
+        } else {
+            if (title) title.textContent = "Interactive Queue Dynamics Model";
+            if (desc) desc.innerHTML = isAgentic ? 
+                "<strong>Parallel Execution Queue Model (M/M/c Model):</strong> Mean wait Wq = 48.5 min, backlog Lq = 2 jobs across parallel worker nodes." : 
+                "<strong>Serialized Queuing Bottleneck (M/M/1 Model):</strong> Mean wait Wq = 14.2h, backlog Lq = 18 requests with developer balking/reneging.";
+        }
+
+        blueprintAnimT = 0;
+        deaAnimProgress = 0;
+
+        renderOverlayFrame();
+    } catch (e) {
+        console.error("Error opening vis overlay:", e);
+    }
+}
+
+function closeVisOverlay() {
+    try {
+        overlayOpen = false;
+        const modal = document.getElementById("vis-overlay-modal");
+        if (modal) modal.classList.add("opacity-0", "pointer-events-none");
+    } catch (e) {
+        console.error("Error closing vis overlay:", e);
+    }
+}
+
+function renderOverlayFrame() {
+    if (!overlayOpen) return;
+
+    try {
+        const canvas = document.getElementById("vis-overlay-canvas");
+        if (canvas) {
+            const ctx = canvas.getContext("2d");
+            if (ctx) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                if (overlayVisType === 'blueprint') {
+                    drawBlueprintVisual(ctx, canvas.width, canvas.height);
+                } else if (overlayVisType === 'qfd') {
+                    drawQFDVisual(ctx, canvas.width, canvas.height);
+                } else if (overlayVisType === 'dea') {
+                    drawDEAVisual(ctx, canvas.width, canvas.height);
+                } else {
+                    drawQueueVisual(ctx, canvas.width, canvas.height);
+                }
+            }
+        }
+    } catch (e) {
+        console.error("Error rendering overlay frame:", e);
+    }
+}
+
+// ------------------------------------------
+// 1. DRAW FIGURE 5.6 SERVICE BLUEPRINT
+// ------------------------------------------
+function drawBlueprintVisual(ctx, w, h) {
+    const laneHeight = h / 5;
+    const lanes = [
+        "1. Physical Evidence / Influence",
+        "2. Customer Actions",
+        "3. Onstage / Front Office",
+        "4. Backstage / Back Office",
+        "5. Support Processes"
+    ];
+
+    const boundaryLines = [
+        "LINE OF INFLUENCE",
+        "LINE OF INTERACTION",
+        "LINE OF VISIBILITY",
+        "LINE OF SUPPORT"
+    ];
+
+    // Swimlane Grid
+    ctx.strokeStyle = "rgba(51, 65, 85, 0.4)";
+    ctx.lineWidth = 1;
+    ctx.font = "bold 8px Outfit";
+
+    for (let i = 1; i < 5; i++) {
+        let y = i * laneHeight;
+        ctx.beginPath();
+        ctx.setLineDash([4, 4]);
+        ctx.moveTo(0, y);
+        ctx.lineTo(w, y);
+        ctx.stroke();
+
+        ctx.fillStyle = "rgba(148, 163, 184, 0.7)";
+        ctx.fillText(boundaryLines[i-1], w - 120, y - 4);
+    }
+    ctx.setLineDash([]);
+
+    ctx.fillStyle = "#94a3b8";
+    lanes.forEach((name, idx) => {
+        ctx.fillText(name.toUpperCase(), 10, idx * laneHeight + 16);
+    });
+
+    const boxes = overlayVisAgentic ? [
+        { x: 100, y: laneHeight * 0.5, txt: "Conversational AI UI" },
+        { x: 230, y: laneHeight * 1.5, txt: "Types Natural Prompt" },
+        { x: 370, y: laneHeight * 2.5, txt: "AI Intent Parser" },
+        { x: 510, y: laneHeight * 3.5, txt: "Cloudify Blueprint Selection" },
+        { x: 650, y: laneHeight * 4.5, txt: "Cloudify API & Policy Engine" }
+    ] : [
+        { x: 100, y: laneHeight * 0.5, txt: "Email Ticketing Portal" },
+        { x: 230, y: laneHeight * 1.5, txt: "User Submits Ticket" },
+        { x: 370, y: laneHeight * 2.5, txt: "Engineer Reads Ticket" },
+        { x: 510, y: laneHeight * 3.5, txt: "Manual HCL Terraform Edit" },
+        { x: 650, y: laneHeight * 4.5, txt: "ITSM DB & Spreadsheets" }
+    ];
+
+    // Draw Connecting Line
+    ctx.strokeStyle = overlayVisAgentic ? "rgba(16, 185, 129, 0.5)" : "rgba(244, 63, 94, 0.5)";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(boxes[0].x, boxes[0].y);
+    for (let i = 1; i < boxes.length; i++) ctx.lineTo(boxes[i].x, boxes[i].y);
+    ctx.stroke();
+
+    // Draw Nodes
+    boxes.forEach(box => {
+        ctx.fillStyle = "rgba(15, 23, 42, 0.95)";
+        ctx.strokeStyle = overlayVisAgentic ? "rgba(16, 185, 129, 0.8)" : "rgba(244, 63, 94, 0.8)";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.roundRect(box.x - 60, box.y - 15, 120, 30, 6);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = "#f8fafc";
+        ctx.font = "bold 8.5px Outfit";
+        ctx.textAlign = "center";
+        ctx.fillText(box.txt, box.x, box.y + 3);
+        ctx.textAlign = "left";
+    });
+
+    // Animated Packet
+    blueprintAnimT += 0.008;
+    if (blueprintAnimT > 1) blueprintAnimT = 0;
+    let pidx = Math.floor(blueprintAnimT * 4);
+    let pt = (blueprintAnimT * 4) % 1;
+    let pStart = boxes[pidx];
+    let pEnd = boxes[pidx + 1];
+    if (pEnd) {
+        let px = pStart.x + (pEnd.x - pStart.x) * pt;
+        let py = pStart.y + (pEnd.y - pStart.y) * pt;
+        ctx.fillStyle = overlayVisAgentic ? "#10b981" : "#f43f5e";
+        ctx.shadowColor = overlayVisAgentic ? "#10b981" : "#f43f5e";
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+        ctx.arc(px, py, 5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+    }
+}
+
+// ------------------------------------------
+// 2. DRAW QFD HOUSE OF QUALITY MATRIX
+// ------------------------------------------
+function drawQFDVisual(ctx, w, h) {
+    let startX = 220;
+    let startY = 110;
+    let cellW = 110;
+    let cellH = 45;
+
+    const whats = ["Fast Provisioning", "Error-Free Scripting", "Budget Compliance", "Role-Based Safety"];
+    const hows = overlayVisAgentic ? ["AI Intent Parsing", "Auto Policy Check", "Cloudify Blueprints", "Terraform State Sync"] : ["Manual HCL Editing", "Engineer Experience", "Manual SLA Checks", "Spreadsheet Auditing"];
+
+    // Correlation Roof Triangle
+    let roofTopX = startX + (cellW * 2);
+    let roofTopY = 25;
+    ctx.fillStyle = "rgba(15, 23, 42, 0.6)";
+    ctx.strokeStyle = overlayVisAgentic ? "rgba(16, 185, 129, 0.5)" : "rgba(244, 63, 94, 0.5)";
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(startX, startY);
+    ctx.lineTo(roofTopX, roofTopY);
+    ctx.lineTo(startX + cellW * 4, startY);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = overlayVisAgentic ? "#10b981" : "#f43f5e";
+    ctx.font = "bold 9px Outfit";
+    ctx.textAlign = "center";
+    ctx.fillText(overlayVisAgentic ? "CORRELATION ROOF: POSITIVE SYNERGY (+)" : "CORRELATION ROOF: HIGH TRADE-OFF FRICTION (❌)", roofTopX, roofTopY + 40);
+
+    // Columns (HOWs)
+    hows.forEach((how, j) => {
+        let x = startX + (j * cellW);
+        let y = startY;
+
+        ctx.fillStyle = "rgba(15, 23, 42, 0.9)";
+        ctx.strokeStyle = "rgba(51, 65, 85, 0.6)";
+        ctx.beginPath();
+        ctx.roundRect(x, y, cellW, cellH, 4);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = "#f8fafc";
+        ctx.font = "bold 8.5px Outfit";
+        ctx.textAlign = "center";
+        ctx.fillText(how, x + cellW / 2, y + cellH / 2 + 3);
+    });
+
+    // Rows (WHATs)
+    whats.forEach((what, i) => {
+        let y = startY + cellH + (i * cellH);
+
+        ctx.fillStyle = "rgba(15, 23, 42, 0.9)";
+        ctx.strokeStyle = "rgba(51, 65, 85, 0.6)";
+        ctx.beginPath();
+        ctx.roundRect(30, y, startX - 40, cellH, 4);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = "#38bdf8";
+        ctx.font = "bold 9px Outfit";
+        ctx.textAlign = "left";
+        ctx.fillText(what, 40, y + cellH / 2 + 3);
+
+        hows.forEach((how, j) => {
+            let x = startX + (j * cellW);
+            ctx.fillStyle = "rgba(15, 23, 42, 0.5)";
+            ctx.strokeStyle = "rgba(51, 65, 85, 0.3)";
+            ctx.beginPath();
+            ctx.roundRect(x, y, cellW, cellH, 2);
+            ctx.fill();
+            ctx.stroke();
+
+            let symbol = overlayVisAgentic ? "⊙" : ((i === 0 && j === 0) ? "∆" : "○");
+            let color = overlayVisAgentic ? "#10b981" : ((i === 0 && j === 0) ? "#f43f5e" : "#94a3b8");
+
+            ctx.fillStyle = color;
+            ctx.font = "bold 13px sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillText(symbol, x + cellW / 2, y + cellH / 2 + 4);
+        });
+    });
+
+    ctx.textAlign = "left";
+}
+
+// ------------------------------------------
+// 3. DRAW DEA SCATTER & CONVEX FRONTIER
+// ------------------------------------------
+function drawDEAVisual(ctx, w, h) {
+    let originX = 65;
+    let originY = h - 50;
+    let chartW = w - 100;
+    let chartH = h - 90;
+
+    // Axes
+    ctx.strokeStyle = "rgba(148, 163, 184, 0.4)";
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(originX, 35);
+    ctx.lineTo(originX, originY);
+    ctx.lineTo(originX + chartW, originY);
+    ctx.stroke();
+
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "bold 8.5px Outfit";
+    ctx.fillText("OUTPUT: Service Throughput (Deployments / Hour)", originX + 10, 25);
+    ctx.fillText("INPUT: Operational Labor Cost & Cycle Time (x_i)", originX + chartW - 190, originY + 25);
+
+    // Convex Frontier Curve
+    ctx.strokeStyle = "#10b981";
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(originX + 30, originY - chartH * 0.88);
+    ctx.quadraticCurveTo(originX + chartW * 0.4, originY - chartH * 0.78, originX + chartW * 0.88, originY - chartH * 0.2);
+    ctx.stroke();
+
+    const dmus = [
+        { name: "DMU-1 (FinTech Ops)", baseInput: 0.75, baseOutput: 0.35, targetInput: 0.75, targetOutput: 0.65 },
+        { name: "DMU-2 (Enterprise SaaS)", baseInput: 0.55, baseOutput: 0.25, targetInput: 0.55, targetOutput: 0.72 },
+        { name: "DMU-3 (Healthcare Cloud)", baseInput: 0.85, baseOutput: 0.42, targetInput: 0.85, targetOutput: 0.60 },
+        { name: "DMU-4 (Retail E-Com)", baseInput: 0.35, baseOutput: 0.18, targetInput: 0.35, targetOutput: 0.75 }
+    ];
+
+    if (overlayVisAgentic) {
+        deaAnimProgress += 0.02;
+        if (deaAnimProgress > 1) deaAnimProgress = 1;
+    } else {
+        deaAnimProgress = 0;
+    }
+
+    dmus.forEach(dmu => {
+        let curX = dmu.baseInput;
+        let curY = dmu.baseOutput + (dmu.targetOutput - dmu.baseOutput) * deaAnimProgress;
+
+        let px = originX + (curX * chartW);
+        let py = originY - (curY * chartH);
+
+        ctx.fillStyle = overlayVisAgentic ? "#10b981" : "#f43f5e";
+        ctx.beginPath();
+        ctx.arc(px, py, 6, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "#f8fafc";
+        ctx.font = "bold 8px Outfit";
+        ctx.fillText(`${dmu.name} (θ = ${(0.62 + (0.27 * deaAnimProgress)).toFixed(2)})`, px + 8, py + 3);
+    });
+
+    ctx.fillStyle = overlayVisAgentic ? "#10b981" : "#f43f5e";
+    ctx.font = "bold 9.5px Outfit";
+    ctx.fillText(overlayVisAgentic ? "AGENTIC EAAS FRONTIER SCORE: θ = 0.89 (High Efficiency Boundary)" : "BASELINE FRONTIER SCORE: θ = 0.62 (Sub-Optimal Inefficiency)", originX + 20, originY - 10);
+}
+
+// ------------------------------------------
+// 4. DRAW OVERLAY QUEUE DYNAMICS
+// ------------------------------------------
+function drawQueueVisual(ctx, w, h) {
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "bold 10px Outfit";
+    ctx.fillText(overlayVisAgentic ? "AGENTIC EAAS QUEUE MODEL (M/M/c): Wq = 48.5 Mins | Lq = 2 Jobs" : "BASELINE QUEUE MODEL (M/M/1): Wq = 14.2 Hours | Lq = 18 Requests", 40, 40);
+
+    ctx.strokeStyle = overlayVisAgentic ? "#10b981" : "#f43f5e";
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(40, 60, w - 80, h - 100);
+
+    ctx.fillStyle = "#f8fafc";
+    ctx.font = "9px Outfit";
+    ctx.fillText(overlayVisAgentic ? "Parallel API worker nodes process incoming request queue with zero bottlenecking." : "Single human operator node handles serialized queue causing balking/reneging.", 50, 90);
+}
+
+// ==========================================
+// 4. STRESS-TEST SCENARIO PRESETS & DES HANDLERS
 // ==========================================
 function applyScenarioPreset(presetType, mode) {
     try {
@@ -299,7 +661,7 @@ function runDES(mode) {
 }
 
 // ==========================================
-// 4. INTERACTIVE FINANCIAL ROI CALCULATOR
+// 5. INTERACTIVE FINANCIAL ROI CALCULATOR
 // ==========================================
 function updateROICalculator() {
     try {
@@ -326,7 +688,7 @@ function updateROICalculator() {
 }
 
 // ==========================================
-// 5. 60FPS HTML5 CANVAS PARTICLE ANIMATION LOOP
+// 6. 60FPS HTML5 CANVAS PARTICLE ANIMATION LOOP
 // ==========================================
 function animationLoop() {
     desFrameCount++;
@@ -335,7 +697,6 @@ function animationLoop() {
         // 1. Render Baseline Particle Canvas
         const canvasB = document.getElementById("canvas-des-particle-b");
         if (canvasB && activeTab === "baseline") {
-            // Synchronize pixel dimensions with element box
             if (canvasB.parentElement) {
                 let rect = canvasB.parentElement.getBoundingClientRect();
                 if (canvasB.width !== Math.floor(rect.width)) canvasB.width = Math.floor(rect.width);
@@ -435,7 +796,7 @@ function animationLoop() {
                     { x: step * 4, label: "🏗️ Terraform" }
                 ];
 
-                // Draw Connecting Line
+                // Connect Line
                 ctx.strokeStyle = "rgba(16, 185, 129, 0.4)";
                 ctx.lineWidth = 2;
                 ctx.setLineDash([4, 4]);
@@ -483,6 +844,12 @@ function animationLoop() {
                 });
             }
         }
+
+        // 3. Render Modal Overlay Frame
+        if (overlayOpen) {
+            renderOverlayFrame();
+        }
+
     } catch (e) {
         console.error("Error in animation loop:", e);
     }
@@ -491,7 +858,7 @@ function animationLoop() {
 }
 
 // ==========================================
-// 6. RENDERERS & DATA HANDLERS
+// 7. RENDERERS & DATA HANDLERS
 // ==========================================
 function renderDatasetTable() {
     try {
@@ -597,49 +964,6 @@ function closeSOMDrawer() {
         if (drawer) drawer.classList.remove("open-drawer");
     } catch (e) {
         console.error("Error closing SOM drawer:", e);
-    }
-}
-
-function openVisOverlay(type, isAgentic) {
-    try {
-        overlayVisType = type;
-        overlayVisAgentic = isAgentic;
-        overlayOpen = true;
-
-        const modal = document.getElementById("vis-overlay-modal");
-        if (modal) modal.classList.remove("opacity-0", "pointer-events-none");
-        renderOverlayFrame();
-    } catch (e) {
-        console.error("Error opening vis overlay:", e);
-    }
-}
-
-function closeVisOverlay() {
-    try {
-        overlayOpen = false;
-        const modal = document.getElementById("vis-overlay-modal");
-        if (modal) modal.classList.add("opacity-0", "pointer-events-none");
-    } catch (e) {
-        console.error("Error closing vis overlay:", e);
-    }
-}
-
-function renderOverlayFrame() {
-    if (!overlayOpen) return;
-
-    try {
-        const canvas = document.getElementById("vis-overlay-canvas");
-        if (canvas) {
-            const ctx = canvas.getContext("2d");
-            if (ctx) {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = "#94a3b8";
-                ctx.font = "bold 12px Outfit";
-                ctx.fillText(overlayVisAgentic ? "AGENTIC EAAS SERVICE BLUEPRINT & DEA FRONTIER (θ = 0.89)" : "BASELINE SERVICE BLUEPRINT & DEA FRONTIER (θ = 0.62)", 40, 40);
-            }
-        }
-    } catch (e) {
-        console.error("Error rendering overlay frame:", e);
     }
 }
 
